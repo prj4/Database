@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -14,62 +15,7 @@ namespace Database.Test
     public class Tests
     {
         #region TestHelpers
-        internal class DataSeeder
-        {
-            private DbContext _context;
-            public DataSeeder(DbContext context)
-            {
-                _context = context;
-            }
-
-            public void SeedData()
-            {
-                _context.AddRange( new List<Host>()
-                    {
-                        new Host{Email = "Email1@email.com", Name = "Host1", Username = "Username1", PW = "PWPWPWPWPW1"},
-                        new Host{Email = "Email2@email.com", Name = "Host2", Username = "Username2", PW = "PWPWPWPWPW2"},
-                        new Host{Email = "Email3@email.com", Name = "Host3", Username = "Username3", PW = "PWPWPWPWPW3"},
-                    }
-                    );
-
-                _context.AddRange(new List<Guest>()
-                    {
-                        new Guest{Name = "Guest1"},
-                        new Guest{Name = "Guest2"},
-                        new Guest{Name = "Guest3"}
-                    }
-                );
-
-                _context.AddRange(new List<Event>()
-                    {
-                        new Event{Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = 1},
-                        new Event{Location = "Lokation2", Description = "Beskrivelse2", Name = "Event2", HostId = 2, Pin = 2},
-                        new Event{Location = "Lokation3", Description = "Beskrivelse3", Name = "Event3", HostId = 3, Pin = 3},
-                    }
-                );
-
-                _context.AddRange(new List<Picture>()
-                {
-                    new Picture {EventPin = 1, Taker = 1, URL = "wwwroot/Images/1.png"},
-                    new Picture {EventPin = 2, Taker = 2, URL = "wwwroot/Images/2.png"},
-                    new Picture {EventPin = 3, Taker = 3, URL = "wwwroot/Images/3.png"}
-                    }
-                );
-
-                _context.AddRange(new List<EventGuest>()
-                    {
-                        new EventGuest {Event_Pin = 1, Guest_Id = 2},
-                        new EventGuest {Event_Pin = 2, Guest_Id = 3},
-                        new EventGuest {Event_Pin = 3, Guest_Id = 1}
-                    }
-                );
-                
-                
-                
-
-                _context.SaveChanges();
-            }
-        }
+        
         private InMemoryDatabaseHelper _inMemoryDatabase;
         #endregion
 
@@ -95,7 +41,7 @@ namespace Database.Test
         }
         #endregion
 
-        #region Creation Tests
+        #region Creation/Read Tests
         
         [TestCase("Username1")]
         [TestCase("Username2")]
@@ -195,6 +141,168 @@ namespace Database.Test
 
 
 
+
+        #endregion
+
+        #region Update/Read Tests
+        [TestCase("Email1@email.com","MortenRosenquist@gmail.com")]
+        [TestCase("Email2@email.com","MortenLyng@gmail.com")]
+        [TestCase("Email3@email.com", "Morten@gmail.com")]
+        public void UpdateOfHost_SearchingOnEmailAndChanging_ReturnsTrue(string emailBefore, string emailAfter)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var result = context.Hosts
+                    .Where(x => x.Email == emailBefore)
+                    .FirstOrDefault().Email = emailAfter;
+
+                Assert.AreEqual(emailAfter, result);
+            }
+        }
+
+
+
+        [TestCase("Guest1", "NewGuest1")]
+        [TestCase("Guest2", "NewGuest2")]
+        [TestCase("Guest3", "NewGuest3")]
+        public void UpdateOfGuest_SearchingOnNameAndChanging_ReturnsTrue(string nameBefore, string nameAfter)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var result = context.Guests
+                    .Where(g => g.Name == nameBefore)
+                    .FirstOrDefault().Name = nameAfter;
+
+                Assert.AreEqual(nameAfter, result);
+            }
+        }
+
+
+        [TestCase("Beskrivelse1", "NewDescription1")]
+        [TestCase("Beskrivelse2", "NewDescription2")]
+        [TestCase("Beskrivelse3", "NewDescription3")]
+        public void UpdateOfEvent_SearchingOnDescriptionAndChanging_ReturnsTrue(string descriptionBefore, string descriptionAfter)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var result = context.Events
+                    .Where(e => e.Description == descriptionBefore)
+                    .FirstOrDefault().Description = descriptionAfter;
+
+                Assert.AreEqual(descriptionAfter, result);
+            }
+        }
+
+        [TestCase("wwwroot/Images/1.png", "New/URL1")]
+        [TestCase("wwwroot/Images/2.png", "New/URL2")]
+        [TestCase("wwwroot/Images/3.png", "New/URL3")]
+        public void UpdateOfPicture_SearchingOnPUrlAndChanging_ReturnsTrue(string urlBefore, string urlAfter)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var result = context.Pictures
+                    .Where(p => p.URL == urlBefore)
+                    .FirstOrDefault().URL = urlAfter;
+
+                Assert.AreEqual(urlAfter, result);
+            }
+        }
+#endregion
+
+        #region Deletion/Read Tests
+        
+        [TestCase("Host2")]
+        [TestCase("Host3")]
+        public void DeletionOfHost_SearchingOnNameDeletingAndFinding_returnsFalse(string name)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var host = context.Hosts.FirstOrDefault(h => h.Name == name);
+                context.Hosts.Remove(host);
+                context.SaveChanges();
+
+                bool result = context.Hosts.Any(h => h.Name == name);
+                Assert.False(result);
+            }
+        }
+
+        [TestCase("Guest2")]
+        [TestCase("Guest3")]
+        public void DeletionOfGuest_SearchingOnNameDeletingAndFinding_returnsFalse(string name)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var Guest = context.Guests.FirstOrDefault(h => h.Name == name);
+                context.Guests.Remove(Guest);
+                context.SaveChanges();
+
+                bool result = context.Guests.Any(h => h.Name == name);
+                Assert.False(result);
+            }
+        }
+
+        
+        [TestCase("Event3")]
+        public void DeletionOfEvent_SearchingOnNameDeletingAndFinding_returnsFalse(string name)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var Event = context.Events.FirstOrDefault(h => h.Name == name);
+                context.Events.Remove(Event);
+                context.SaveChanges();
+
+                bool result = context.Events.Any(h => h.Name == name);
+                Assert.False(result);
+            }
+        }
+
+        [TestCase("wwwroot/Images/1.png")]
+        [TestCase("wwwroot/Images/2.png")]
+        [TestCase("wwwroot/Images/3.png")]
+        public void DeletionOPicture_SearchingOnURLDeletingAndFinding_returnsFalse(string url)
+        {
+            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
+            {
+                DataSeeder dataSeeder = new DataSeeder(context);
+                dataSeeder.SeedData();
+
+                var picture = context.Pictures.FirstOrDefault(p => p.URL == url);
+                context.Pictures.Remove(picture);
+                context.SaveChanges();
+
+                bool result = context.Pictures.Any(p => p.URL == url);
+                Assert.False(result);
+            }
+        }
+
+
+
+        #endregion
+
+        #region Corner Cases
+
+        
 
         #endregion
 

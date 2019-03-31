@@ -20,59 +20,123 @@ namespace PhotoBook.Repository.HostRepository
         /* IHostRepository Implementation*/
         public async Task<IEnumerable<Host>> GetHosts()
         {
-            var hosts = _context.Hosts.ToListAsync().Result;
-            await _context.SaveChangesAsync();
-            return hosts;
+            if (_context.Hosts.AnyAsync().Result)
+            {
+                var hosts = _context.Hosts.ToListAsync().Result;
+                await _context.SaveChangesAsync();
+                return hosts;
+            }
+
+            return null;
         }
 
         public async Task<Host> GetHost(int hostId)
         {
-            var host = _context.Hosts
-                .FindAsync(hostId).Result;
-            await _context.SaveChangesAsync();
-            return host;
+            if (Exists(hostId).Result)
+            {
+                var host = _context.Hosts
+                    .FindAsync(hostId).Result;
+                await _context.SaveChangesAsync();
+                return host;
+            }
+
+            return null;
         }
 
         public async Task<Host> GetHost(string hostName)
         {
-            var host = _context.Hosts
-                .Where(x => x.Username == hostName)
-                .FirstOrDefaultAsync().Result;
-            await _context.SaveChangesAsync();
-            return host;
+            if (Exists(hostName).Result)
+            {
+                var host = _context.Hosts
+                    .Where(x => x.Name == hostName)
+                    .FirstOrDefaultAsync().Result;
+                await _context.SaveChangesAsync();
+                return host;
+            }
+
+            return null;
         }
 
         public async void InsertHost(Host host)
         {
-            await _context.Hosts.AddAsync(host);
-            await _context.SaveChangesAsync();
+            if (!Exists(host).Result)
+            {
+                await _context.Hosts.AddAsync(host);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async void DeleteHost(int hostId)
         {
-            var host = _context.Hosts
-                .FindAsync(hostId).Result;
+            if (Exists(hostId).Result)
+            {
+                var host = _context.Hosts
+                    .FindAsync(hostId).Result;
 
-            _context.Hosts.Remove(host);
-            await _context.SaveChangesAsync();
+                _context.Hosts.Remove(host);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async void DeleteHost(string hostName)
         {
-            var host = _context.Hosts
-                .Where(x => x.Username == hostName)
-                .FirstOrDefaultAsync().Result;
+            if (Exists(hostName).Result)
+            {
+                var host = _context.Hosts
+                    .Where(x => x.Name == hostName)
+                    .FirstOrDefaultAsync().Result;
 
-            _context.Hosts.Remove(host);
-            await _context.SaveChangesAsync();
+                _context.Hosts.Remove(host);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public async void UpdateHost(Host host)
+        public async void UpdateHost(Host host, string email)
         {
-            _context.Entry(host).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            if (Exists(host).Result)
+            {
+                var entity = _context.Hosts.FirstOrDefault(
+                    h => h.PictureTakerId == host.PictureTakerId);
+
+                entity.Email = email;
+
+                await _context.SaveChangesAsync();
+            }
         }
 
+        public async void UpdateHost(Host host, string email, string password)
+        {
+            if (Exists(host).Result)
+            {
+                var entity = _context.Hosts.FirstOrDefault(
+                    h => h.PictureTakerId == host.PictureTakerId);
 
+                entity.Email = email;
+                entity.PW = password;
+
+                await _context.SaveChangesAsync();
+            }
+
+            return;
+        }
+
+        private async Task<bool> Exists(Host host)
+        {
+            return _context.Hosts.ContainsAsync(host).Result;
+        }
+        private async Task<bool> Exists(int id)
+        {
+            if (_context.Hosts
+                .AnyAsync(h => h.PictureTakerId == id).Result)
+                return true;
+            return false;
+        }
+        private async Task<bool> Exists(string name)
+        {
+            if (_context.Hosts
+                .AnyAsync(h => h.Name == name).Result)
+                return true;
+            return false;
+        }
     }
 }

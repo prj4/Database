@@ -5,10 +5,11 @@ using System.Text;
 using NUnit.Framework;
 using PhotoBook.Repository.EventRepository;
 using PhotoBook.Repository.GuestRepository;
+using PhotoBook.Test;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace PhotoBook.Test.Repository.Test
+namespace Repository.Test
 {
     public class GuestRepositoryTest
     {

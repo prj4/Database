@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PhotoBook.Repository.PictureRepository
 {
-    class PictureRepository
+    public class PictureRepository
     {
     }
 }

@@ -31,9 +31,11 @@ namespace PhotoBookDatabase.Migrations
 
                     b.Property<int>("HostId");
 
-                    b.Property<string>("Location");
+                    b.Property<string>("Location")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<DateTime>("StartDate");
 

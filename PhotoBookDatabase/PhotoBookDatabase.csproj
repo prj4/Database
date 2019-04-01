@@ -25,6 +25,8 @@
     <Compile Remove="Migrations\20190331152428_Base.cs" />
     <Compile Remove="Migrations\20190331154105_Base.cs" />
     <Compile Remove="Migrations\20190331154744_base.cs" />
+    <Compile Remove="Migrations\20190331155248_base.cs" />
+    <Compile Remove="Migrations\20190401175955_Base.cs" />
     <Compile Remove="Model\EventGuests.cs" />
     <Compile Remove="Program.cs" />
   </ItemGroup>

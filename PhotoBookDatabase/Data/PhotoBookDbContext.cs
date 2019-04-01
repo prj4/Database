@@ -38,7 +38,7 @@ namespace PhotoBookDatabase.Data
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
-                relationship.DeleteBehavior = DeleteBehavior.Cascade;
+                relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
             HostOnModelCreating(modelBuilder);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PhotoBookDatabase.Model;
 
+//TODO: Maybe change so dont use function overload
 namespace PhotoBook.Repository.GuestRepository
 {
     public interface IGuestRepository

@@ -18,17 +18,17 @@ namespace PhotoBook.Test
         {
             _context.AddRange(new List<Host>()
                     {
-                        new Host{Email = "Email1@email.com", Name = "Host", Username = "Username1", PW = "PWPWPWPWPW1"},
-                        new Host{Email = "Email2@email.com", Name = "Host2", Username = "Username2", PW = "PWPWPWPWPW2"},
-                        new Host{Email = "Email3@email.com", Name = "Host3", Username = "Username3", PW = "PWPWPWPWPW3"},
+                        new Host{Email = "Email1@email.com", Name = "Host", Username = "Username1", PW = "PWPWPWPWPW1", PictureTakerId = 1},
+                        new Host{Email = "Email2@email.com", Name = "Host2", Username = "Username2", PW = "PWPWPWPWPW2", PictureTakerId = 2},
+                        new Host{Email = "Email3@email.com", Name = "Host3", Username = "Username3", PW = "PWPWPWPWPW3", PictureTakerId = 3},
                     }
                 );
 
             _context.AddRange(new List<Guest>()
                     {
-                        new Guest{Name = "Guest1"},
-                        new Guest{Name = "Guest2"},
-                        new Guest{Name = "Guest3"}
+                        new Guest{Name = "Guest1", PictureTakerId = 4},
+                        new Guest{Name = "Guest2", PictureTakerId = 5},
+                        new Guest{Name = "Guest3", PictureTakerId = 6}
                     }
             );
 
@@ -50,9 +50,9 @@ namespace PhotoBook.Test
 
             _context.AddRange(new List<EventGuest>()
                     {
-                        new EventGuest {Event_Pin = 1, Guest_Id = 2},
-                        new EventGuest {Event_Pin = 2, Guest_Id = 3},
-                        new EventGuest {Event_Pin = 3, Guest_Id = 1}
+                        new EventGuest {Event_Pin = 1, Guest_Id = 4},
+                        new EventGuest {Event_Pin = 2, Guest_Id = 5},
+                        new EventGuest {Event_Pin = 3, Guest_Id = 6}
                     }
             );
 

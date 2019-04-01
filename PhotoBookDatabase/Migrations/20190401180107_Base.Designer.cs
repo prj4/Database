@@ -10,8 +10,8 @@ using PhotoBookDatabase.Data;
 namespace PhotoBookDatabase.Migrations
 {
     [DbContext(typeof(PhotoBookDbContext))]
-    [Migration("20190331155248_base")]
-    partial class @base
+    [Migration("20190401180107_Base")]
+    partial class Base
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,9 +33,11 @@ namespace PhotoBookDatabase.Migrations
 
                     b.Property<int>("HostId");
 
-                    b.Property<string>("Location");
+                    b.Property<string>("Location")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<DateTime>("StartDate");
 

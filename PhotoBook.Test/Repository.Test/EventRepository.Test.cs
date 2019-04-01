@@ -16,7 +16,7 @@ using PhotoBookDatabase.Model;
 
 namespace Repository.Test
 {
-    public class EventRepositoryTest
+    class EventRepositoryTest
     {
         private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IEventRepository _uut;

@@ -119,9 +119,9 @@ namespace Database.Test
             }
         }
 
-        [TestCase(1,2)]
-        [TestCase(2,3)]
-        [TestCase(3,1)]
+        [TestCase(1,4)]
+        [TestCase(2,5)]
+        [TestCase(3,6)]
         public void CreationOfEventGuest_SearchingOnEventPin_ReturnsTrueOnGuestId(int eventPin, int guestId)
         {
             using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
@@ -269,6 +269,7 @@ namespace Database.Test
                 dataSeeder.SeedData();
 
                 var Event = context.Events.FirstOrDefault(h => h.Name == name);
+
                 context.Events.Remove(Event);
                 context.SaveChanges();
 

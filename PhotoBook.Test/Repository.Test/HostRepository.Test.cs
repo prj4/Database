@@ -13,7 +13,7 @@ using PhotoBookDatabase.Model;
 
 namespace Repository.Test
 {
-    public class HostRepositoryTest
+    class HostRepositoryTest
     {
         private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IHostRepository _uut;

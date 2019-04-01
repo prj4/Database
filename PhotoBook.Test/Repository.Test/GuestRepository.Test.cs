@@ -11,7 +11,7 @@ using PhotoBookDatabase.Model;
 
 namespace Repository.Test
 {
-    public class GuestRepositoryTest
+    class GuestRepositoryTest
     {
         private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IGuestRepository _uut;

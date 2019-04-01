@@ -12,7 +12,7 @@ using PhotoBookDatabase.Model;
 
 namespace Database.Test
 {
-    public class Tests
+    public class DatabaseTest
     {
         #region TestHelpers
         

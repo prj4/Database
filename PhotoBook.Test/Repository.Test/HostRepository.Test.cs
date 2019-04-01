@@ -13,7 +13,7 @@ using PhotoBookDatabase.Model;
 
 namespace Repository.Test
 {
-    public class Tests
+    public class HostRepositoryTest
     {
         private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IHostRepository _uut;
@@ -67,12 +67,12 @@ namespace Repository.Test
                 dataSeeder.SeedData();
             }
 
-            IEnumerable<Host> hosts = _uut.GetHosts().Result;
+            
+            IQueryable<Host> hosts = _uut.GetHosts().Result;
 
             bool result = hosts.Any(h => h.Username == username);
 
-            Assert.True(result);
-            
+            Assert.True(result); 
         }
 
         
@@ -82,7 +82,7 @@ namespace Repository.Test
         {
             _uut.InsertHost(host);
 
-            IEnumerable<Host> hosts = _uut.GetHosts().Result;
+            IQueryable<Host> hosts = _uut.GetHosts().Result;
 
             bool result = hosts.Any(h => h == host);
 
@@ -114,7 +114,7 @@ namespace Repository.Test
 
             _uut.DeleteHost(host.PictureTakerId);
 
-            IEnumerable<Host> result = _uut.GetHosts().Result;
+            IQueryable<Host> result = _uut.GetHosts().Result;
 
             Assert.AreEqual(null,result);
         }
@@ -126,7 +126,7 @@ namespace Repository.Test
 
             _uut.DeleteHost(host.Name);
 
-            IEnumerable<Host> result = _uut.GetHosts().Result;
+            IQueryable<Host> result = _uut.GetHosts().Result;
 
             Assert.AreEqual(null, result);
         }

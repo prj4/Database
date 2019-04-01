@@ -17,14 +17,48 @@ namespace PhotoBook.Repository.HostRepository
             _context = context;
         }
 
-        /* IHostRepository Implementation*/
-        public async Task<IEnumerable<Host>> GetHosts()
+        #region Private Methods
+
+        private async Task<bool> IfAny()
         {
-            if (_context.Hosts.AnyAsync().Result)
+           bool result = await _context.Hosts.AnyAsync();
+           return result;
+        }
+        private async Task<bool> Exists(Host host)
+        {
+            bool result = await _context.Hosts.ContainsAsync(host);
+            return result;
+        }
+        private async Task<bool> Exists(int id)
+        {
+            if (await _context.Hosts
+                .AnyAsync(h => h.PictureTakerId == id))
+                return true;
+            return false;
+        }
+        private async Task<bool> Exists(string name)
+        {
+            if (await _context.Hosts
+                .AnyAsync(h => h.Name == name))
+                return true;
+            return false;
+        }
+
+
+        #endregion
+
+        #region IHostRepository Implementation
+        /// <summary>
+        /// Hello
+        /// </summary>
+        /// <returns>Returns Iqueryable of host's, NULL if none</returns>
+        public async Task<IQueryable<Host>> GetHosts()
+        {
+            if (IfAny().Result)
             {
-                var hosts = _context.Hosts.ToListAsync().Result;
+                var hosts = await _context.Hosts.ToListAsync();
                 
-                return hosts;
+                return hosts.AsQueryable();
             }
 
             return null;
@@ -34,8 +68,8 @@ namespace PhotoBook.Repository.HostRepository
         {
             if (Exists(hostId).Result)
             {
-                var host = _context.Hosts
-                    .FindAsync(hostId).Result;
+                var host = await _context.Hosts
+                    .FindAsync(hostId);
                 
                 return host;
             }
@@ -47,9 +81,9 @@ namespace PhotoBook.Repository.HostRepository
         {
             if (Exists(hostName).Result)
             {
-                var host = _context.Hosts
+                var host = await _context.Hosts
                     .Where(x => x.Name == hostName)
-                    .FirstOrDefaultAsync().Result;
+                    .FirstOrDefaultAsync();
                 
                 return host;
             }
@@ -120,23 +154,7 @@ namespace PhotoBook.Repository.HostRepository
             return;
         }
 
-        private async Task<bool> Exists(Host host)
-        {
-            return _context.Hosts.ContainsAsync(host).Result;
-        }
-        private async Task<bool> Exists(int id)
-        {
-            if (_context.Hosts
-                .AnyAsync(h => h.PictureTakerId == id).Result)
-                return true;
-            return false;
-        }
-        private async Task<bool> Exists(string name)
-        {
-            if (_context.Hosts
-                .AnyAsync(h => h.Name == name).Result)
-                return true;
-            return false;
-        }
+        
+        #endregion
     }
 }

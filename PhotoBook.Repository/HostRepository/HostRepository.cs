@@ -129,7 +129,7 @@ namespace PhotoBook.Repository.HostRepository
         {
             if (Exists(host).Result)
             {
-                var entity = _context.Hosts.FirstOrDefault(
+                var entity = await _context.Hosts.FirstOrDefaultAsync(
                     h => h.PictureTakerId == host.PictureTakerId);
 
                 entity.Email = email;
@@ -142,7 +142,7 @@ namespace PhotoBook.Repository.HostRepository
         {
             if (Exists(host).Result)
             {
-                var entity = _context.Hosts.FirstOrDefault(
+                var entity = await _context.Hosts.FirstOrDefaultAsync(
                     h => h.PictureTakerId == host.PictureTakerId);
 
                 entity.Email = email;

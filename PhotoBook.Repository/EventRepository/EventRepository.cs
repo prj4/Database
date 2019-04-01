@@ -124,7 +124,7 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (Exists(eve).Result)
             {
-                var entity = _context.Events.Find(eve.Pin);
+                var entity = await _context.Events.FindAsync(eve.Pin);
                 
 
                 entity.Description = eve.Description;

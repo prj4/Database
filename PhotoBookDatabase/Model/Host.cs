@@ -20,9 +20,6 @@ namespace PhotoBookDatabase.Model
         public string Email { get; set;}
         public List<Event> Events { get; set; }
 
-        public override string ToString()
-        {
-            return $"{Username}, {PW}, {Email} {base.Name}";
-        }
+        
     }
 }

@@ -23,7 +23,7 @@ namespace PhotoBook.Repository.HostRepository
             if (_context.Hosts.AnyAsync().Result)
             {
                 var hosts = _context.Hosts.ToListAsync().Result;
-                await _context.SaveChangesAsync();
+                
                 return hosts;
             }
 
@@ -36,7 +36,7 @@ namespace PhotoBook.Repository.HostRepository
             {
                 var host = _context.Hosts
                     .FindAsync(hostId).Result;
-                await _context.SaveChangesAsync();
+                
                 return host;
             }
 
@@ -50,7 +50,7 @@ namespace PhotoBook.Repository.HostRepository
                 var host = _context.Hosts
                     .Where(x => x.Name == hostName)
                     .FirstOrDefaultAsync().Result;
-                await _context.SaveChangesAsync();
+                
                 return host;
             }
 

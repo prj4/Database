@@ -34,9 +34,9 @@ namespace PhotoBook.Test
 
             _context.AddRange(new List<Event>()
                     {
-                        new Event{Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = 1},
-                        new Event{Location = "Lokation2", Description = "Beskrivelse2", Name = "Event2", HostId = 2, Pin = 2},
-                        new Event{Location = "Lokation3", Description = "Beskrivelse3", Name = "Event3", HostId = 3, Pin = 3},
+                        new Event{Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = 1, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+                        new Event{Location = "Lokation2", Description = "Beskrivelse2", Name = "Event2", HostId = 2, Pin = 2, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+                        new Event{Location = "Lokation3", Description = "Beskrivelse3", Name = "Event3", HostId = 3, Pin = 3, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
                     }
             );
 

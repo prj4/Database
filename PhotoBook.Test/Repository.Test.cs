@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.InMemory.Storage.Internal;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using PhotoBook.Repository.HostRepository;
@@ -172,7 +173,21 @@ namespace Repository.Test
         #endregion
 
         #region Failure Tests / Corner Cases
+        [Test]
+        public void GetHostById_TryingToGetNonExistingHost_ReturnsNull()
+        {
+            var result = _uut.GetHost(1).Result;
 
+            Assert.AreEqual(null,result);
+        }
+
+        [Test]
+        public void GetHostByName_TryingToGetNonExistingHost_ReturnsNull()
+        {
+            var result = _uut.GetHost("Test").Result;
+
+            Assert.AreEqual(null, result);
+        }
 
 
         #endregion

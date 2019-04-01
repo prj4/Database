@@ -14,9 +14,6 @@ namespace PhotoBookDatabase.Model
         public String Name { get; set; }
         public List<Picture> Pictures { get; set; }
 
-        public override string ToString()
-        {
-            return $"{Name}";
-        }
+        
     }
 }

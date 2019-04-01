@@ -10,9 +10,6 @@ namespace PhotoBookDatabase.Model
     {
         
         public IList<EventGuest> EventGuests { get; set; }
-        public override string ToString()
-        {
-            return $"{base.Name}";
-        }
+        
     }
 }

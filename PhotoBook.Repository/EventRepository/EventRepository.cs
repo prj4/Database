@@ -2,21 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
-
+[assembly: InternalsVisibleTo("PhotoBook.Test")]
 namespace PhotoBook.Repository.EventRepository
 {
     public class EventRepository : IEventRepository
     {
         private PhotoBookDbContext _context;
+        private DbContextOptions<PhotoBookDbContext> _options;
 
-        public EventRepository(PhotoBookDbContext context)
+        internal EventRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = context;
+            _context = new PhotoBookDbContext(options);
+        }
+
+
+        public EventRepository(string connectionString)
+        {
+            _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseSqlServer(connectionString)
+                .Options;
+
+            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
@@ -28,7 +40,8 @@ namespace PhotoBook.Repository.EventRepository
         }
         private async Task<bool> Exists(Event eve)
         {
-            bool result = await _context.Events.ContainsAsync(eve);
+            bool result = await _context.Events.AnyAsync(e => e.HostId == eve.HostId); 
+
             return result;
         }
         private async Task<bool> Exists(int pin)

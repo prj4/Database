@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.InMemory.Storage.Internal;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
-using PhotoBook.Test;
+
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
@@ -14,30 +14,29 @@ namespace Database.Test
 {
     public class DatabaseTest
     {
-        #region TestHelpers
-        
-        private InMemoryDatabaseHelper _inMemoryDatabase;
-        #endregion
+        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+        private PhotoBookDbContext _context;
 
+        public DatabaseTest()
+        {
+            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseInMemoryDatabase("Test")
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .Options;
+        }
         #region Setup and TearDown   
         [SetUp]
         public void Setup()
         {
-            _inMemoryDatabase = new InMemoryDatabaseHelper("UnitTest");
+            _context = new PhotoBookDbContext(_InMemoryOptions);
 
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                context.Database.EnsureCreated();
-            }
+            _context.Database.EnsureCreated();
         }
 
         [TearDown]
         public void TearDown()
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                context.Database.EnsureDeleted();
-            }
+            _context.Database.EnsureDeleted();
         }
         #endregion
 
@@ -48,18 +47,13 @@ namespace Database.Test
         [TestCase("Username3")]
         public void CreationOfHost_SearchingOnUserName_ReturnsTrue(string userName)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
-                
+           
 
-                var result = context.Hosts
+                var result = _context.Hosts
                     .Where(x => x.Username == userName)
                     .FirstOrDefault().Username;
 
                 Assert.AreEqual(result,userName);
-            }
         }
 
 
@@ -69,17 +63,11 @@ namespace Database.Test
         [TestCase("Guest3")]
         public void CreationOfGuest_SearchingOnName_ReturnsTrue(string name)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.Guests
+                .Where(g => g.Name == name)
+                .FirstOrDefault().Name;
 
-                var result = context.Guests
-                    .Where(g => g.Name == name)
-                    .FirstOrDefault().Name;
-
-                Assert.AreEqual(result, name);
-            }
+            Assert.AreEqual(result, name);
         }
 
 
@@ -88,17 +76,11 @@ namespace Database.Test
         [TestCase(3)]
         public void CreationOfEvent_SearchingOnPin_ReturnsTrue(int pin)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.Events
+                .Where(e => e.Pin == pin)
+                .FirstOrDefault().Pin;
 
-                var result = context.Events
-                    .Where(e => e.Pin == pin)
-                    .FirstOrDefault().Pin;
-
-                Assert.AreEqual(pin, result);
-            }
+            Assert.AreEqual(pin, result);
         }
 
         [TestCase("wwwroot/Images/1.png")]
@@ -106,17 +88,12 @@ namespace Database.Test
         [TestCase("wwwroot/Images/3.png")]
         public void CreationOfPicture_SearchingOnPUrl_ReturnsTrue(string url)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
-
-                var result = context.Pictures
+                var result = _context.Pictures
                     .Where(p => p.URL == url)
                     .FirstOrDefault().URL;
 
                 Assert.AreEqual(url, result);
-            }
+            
         }
 
         [TestCase(1,4)]
@@ -124,17 +101,12 @@ namespace Database.Test
         [TestCase(3,6)]
         public void CreationOfEventGuest_SearchingOnEventPin_ReturnsTrueOnGuestId(int eventPin, int guestId)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.EventGuests
+                .Where(eg => eg.Event_Pin == eventPin)
+                .FirstOrDefault().Guest_Id;
 
-                var result = context.EventGuests
-                    .Where(eg => eg.Event_Pin == eventPin)
-                    .FirstOrDefault().Guest_Id;
+            Assert.AreEqual(guestId, result);
 
-                Assert.AreEqual(guestId, result);
-            }
         }
 
 
@@ -150,17 +122,11 @@ namespace Database.Test
         [TestCase("Email3@email.com", "Morten@gmail.com")]
         public void UpdateOfHost_SearchingOnEmailAndChanging_ReturnsTrue(string emailBefore, string emailAfter)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.Hosts
+                .Where(x => x.Email == emailBefore)
+                .FirstOrDefault().Email = emailAfter;
 
-                var result = context.Hosts
-                    .Where(x => x.Email == emailBefore)
-                    .FirstOrDefault().Email = emailAfter;
-
-                Assert.AreEqual(emailAfter, result);
-            }
+            Assert.AreEqual(emailAfter, result);
         }
 
 
@@ -170,17 +136,11 @@ namespace Database.Test
         [TestCase("Guest3", "NewGuest3")]
         public void UpdateOfGuest_SearchingOnNameAndChanging_ReturnsTrue(string nameBefore, string nameAfter)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.Guests
+                .Where(g => g.Name == nameBefore)
+                .FirstOrDefault().Name = nameAfter;
 
-                var result = context.Guests
-                    .Where(g => g.Name == nameBefore)
-                    .FirstOrDefault().Name = nameAfter;
-
-                Assert.AreEqual(nameAfter, result);
-            }
+            Assert.AreEqual(nameAfter, result);
         }
 
 
@@ -189,17 +149,11 @@ namespace Database.Test
         [TestCase("Beskrivelse3", "NewDescription3")]
         public void UpdateOfEvent_SearchingOnDescriptionAndChanging_ReturnsTrue(string descriptionBefore, string descriptionAfter)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.Events
+                .Where(e => e.Description == descriptionBefore)
+                .FirstOrDefault().Description = descriptionAfter;
 
-                var result = context.Events
-                    .Where(e => e.Description == descriptionBefore)
-                    .FirstOrDefault().Description = descriptionAfter;
-
-                Assert.AreEqual(descriptionAfter, result);
-            }
+            Assert.AreEqual(descriptionAfter, result);
         }
 
         [TestCase("wwwroot/Images/1.png", "New/URL1")]
@@ -207,17 +161,11 @@ namespace Database.Test
         [TestCase("wwwroot/Images/3.png", "New/URL3")]
         public void UpdateOfPicture_SearchingOnPUrlAndChanging_ReturnsTrue(string urlBefore, string urlAfter)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var result = _context.Pictures
+                .Where(p => p.URL == urlBefore)
+                .FirstOrDefault().URL = urlAfter;
 
-                var result = context.Pictures
-                    .Where(p => p.URL == urlBefore)
-                    .FirstOrDefault().URL = urlAfter;
-
-                Assert.AreEqual(urlAfter, result);
-            }
+            Assert.AreEqual(urlAfter, result);
         }
 #endregion
 
@@ -227,55 +175,37 @@ namespace Database.Test
         [TestCase("Host3")]
         public void DeletionOfHost_SearchingOnNameDeletingAndFinding_returnsFalse(string name)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var host = _context.Hosts.FirstOrDefault(h => h.Name == name);
+            _context.Hosts.Remove(host);
+            _context.SaveChanges();
 
-                var host = context.Hosts.FirstOrDefault(h => h.Name == name);
-                context.Hosts.Remove(host);
-                context.SaveChanges();
-
-                bool result = context.Hosts.Any(h => h.Name == name);
-                Assert.False(result);
-            }
+            bool result = _context.Hosts.Any(h => h.Name == name);
+            Assert.False(result);
         }
 
         [TestCase("Guest2")]
         [TestCase("Guest3")]
         public void DeletionOfGuest_SearchingOnNameDeletingAndFinding_returnsFalse(string name)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var Guest = _context.Guests.FirstOrDefault(h => h.Name == name);
+            _context.Guests.Remove(Guest);
+            _context.SaveChanges();
 
-                var Guest = context.Guests.FirstOrDefault(h => h.Name == name);
-                context.Guests.Remove(Guest);
-                context.SaveChanges();
-
-                bool result = context.Guests.Any(h => h.Name == name);
-                Assert.False(result);
-            }
+            bool result = _context.Guests.Any(h => h.Name == name);
+            Assert.False(result);
         }
 
         
         [TestCase("Event3")]
         public void DeletionOfEvent_SearchingOnNameDeletingAndFinding_returnsFalse(string name)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+            var Event = _context.Events.FirstOrDefault(h => h.Name == name);
 
-                var Event = context.Events.FirstOrDefault(h => h.Name == name);
+            _context.Events.Remove(Event);
+            _context.SaveChanges();
 
-                context.Events.Remove(Event);
-                context.SaveChanges();
-
-                bool result = context.Events.Any(h => h.Name == name);
-                Assert.False(result);
-            }
+            bool result = _context.Events.Any(h => h.Name == name);
+            Assert.False(result);
         }
 
         [TestCase("wwwroot/Images/1.png")]
@@ -283,18 +213,13 @@ namespace Database.Test
         [TestCase("wwwroot/Images/3.png")]
         public void DeletionOPicture_SearchingOnURLDeletingAndFinding_returnsFalse(string url)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabase._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
+                var picture = _context.Pictures.FirstOrDefault(p => p.URL == url);
+                _context.Pictures.Remove(picture);
+                _context.SaveChanges();
 
-                var picture = context.Pictures.FirstOrDefault(p => p.URL == url);
-                context.Pictures.Remove(picture);
-                context.SaveChanges();
-
-                bool result = context.Pictures.Any(p => p.URL == url);
+                bool result = _context.Pictures.Any(p => p.URL == url);
                 Assert.False(result);
-            }
+            
         }
 
 

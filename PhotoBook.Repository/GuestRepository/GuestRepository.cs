@@ -1,21 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
-
+[assembly: InternalsVisibleTo("PhotoBook.Test")]
 namespace PhotoBook.Repository.GuestRepository
 {
     public class GuestRepository : IGuestRepository
     {
         private PhotoBookDbContext _context;
+        private DbContextOptions<PhotoBookDbContext> _options;
 
-        public GuestRepository(PhotoBookDbContext context)
+        internal GuestRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = context;
+            _context = new PhotoBookDbContext(options);
+        }
+
+        public GuestRepository(string connectionString)
+        {
+            _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseSqlServer(connectionString)
+                .Options;
+
+            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
@@ -27,7 +38,7 @@ namespace PhotoBook.Repository.GuestRepository
         }
         private async Task<bool> Exists(Guest guest)
         {
-            bool result = await _context.Guests.ContainsAsync(guest);
+            bool result = await _context.Guests.AnyAsync(g => g.PictureTakerId == guest.PictureTakerId);
             return result;
         }
         private async Task<bool> Exists(int id)

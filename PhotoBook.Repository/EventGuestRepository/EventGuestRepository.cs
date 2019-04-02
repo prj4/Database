@@ -1,21 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
-
+[assembly: InternalsVisibleTo("PhotoBook.Test")]
+ 
 namespace PhotoBook.Repository.EventGuestRepository
 {
     public class EventGuestRepository : IEventGuestRepository
     {
         private PhotoBookDbContext _context;
+        private DbContextOptions<PhotoBookDbContext> _options;
 
-        public EventGuestRepository(PhotoBookDbContext context)
+        internal EventGuestRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = context;
+            _context = new PhotoBookDbContext(options);
+        }
+
+        public EventGuestRepository(string connectionString)
+        {
+            _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseSqlServer(connectionString)
+                .Options;
+
+            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
@@ -27,7 +39,9 @@ namespace PhotoBook.Repository.EventGuestRepository
         }
         private async Task<bool> Exists(EventGuest eventGuest)
         {
-            bool result = await _context.EventGuests.ContainsAsync(eventGuest);
+            bool result = await _context.EventGuests
+                .AnyAsync(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
+                                         (eg.Guest_Id == eventGuest.Guest_Id));
             return result;
         }
         private async Task<bool> ExistsByEventPin(int eventPin)
@@ -96,43 +110,14 @@ namespace PhotoBook.Repository.EventGuestRepository
             }
         }
 
-        public async void DeleteEventGuestByEventPin(int eventPin)
-        {
-            if (ExistsByEventPin(eventPin).Result)
-            {
-                var eventGuest = _context.EventGuests
-                    .FindAsync(eventPin).Result;
-
-                _context.EventGuests.Remove(eventGuest);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async void DeleteEventGuestByGuestId(int guestId)
-        {
-            if (ExistsByGuestId(guestId).Result)
-            {
-                var eventGuest = _context.EventGuests
-                    .FindAsync(guestId).Result;
-
-                _context.EventGuests.Remove(eventGuest);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async void UpdateEventGuest(EventGuest eventGuest)
+        public async void DeleteEventGuest(EventGuest eventGuest)
         {
             if (Exists(eventGuest).Result)
             {
-                var entity = await _context.EventGuests
-                    .Where(eg =>((eg.Event_Pin == eventGuest.Event_Pin) && 
-                                 (eg.Guest_Id == eventGuest.Guest_Id)))
-                    .SingleAsync();
+                var eg = _context.EventGuests
+                    .FindAsync(eventGuest.Event_Pin,eventGuest.Guest_Id).Result;
 
-                entity.Guest_Id = eventGuest.Guest_Id;
-                entity.Event_Pin = eventGuest.Event_Pin;
-
-                _context.Update(entity);
+                _context.EventGuests.Remove(eventGuest);
 
                 await _context.SaveChangesAsync();
             }

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
 using PhotoBook.Repository.EventGuestRepository;
-using PhotoBook.Repository.EventRepository;
-using PhotoBook.Test;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
@@ -13,15 +13,22 @@ namespace Repository.Test
 {
     class EventGuestRepositoryTest
     {
-        private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IEventGuestRepository _uut;
+        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
 
+        public EventGuestRepositoryTest()
+        {
+            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .Options;
+        }
         #region Sources
         private static EventGuest[] EventGuestSource =
         {
-            new EventGuest {Event_Pin = 1, Guest_Id = 4},
-            new EventGuest {Event_Pin = 2, Guest_Id = 5},
-            new EventGuest {Event_Pin = 3, Guest_Id = 6}
+            new EventGuest {Event_Pin = 3, Guest_Id = 1},
+            new EventGuest {Event_Pin = 3, Guest_Id = 2},
+            new EventGuest {Event_Pin = 3, Guest_Id = 3}
         };
 
         #endregion
@@ -31,55 +38,91 @@ namespace Repository.Test
         [SetUp]
         public void Setup()
         {
-            _inMemoryDatabaseHelper = new InMemoryDatabaseHelper("UnitTest");
-            _uut = new EventGuestRepository(new PhotoBookDbContext(_inMemoryDatabaseHelper._options));
-
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureCreated();
-            }
+            _uut = new EventGuestRepository(_InMemoryOptions);
         }
 
         [TearDown]
         public void TearDown()
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureDeleted();
-            }
         }
         #endregion
 
         #region Success Tests
 
-        [TestCase(1, 4)]
-        [TestCase(2, 5)]
-        [TestCase(3, 6)]
-        public void GetEventGuests_CheckingIfIQueryableContains_ReturnsTrue(int eventPin, int guestId)
+        [Test, TestCaseSource("EventGuestSource")]
+        public void GetEventGuests_InsertingCheckingIfIQueryableContains_ReturnsTrue(EventGuest eventGuest)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
-            }
-
+            _uut.InsertEventGuest(eventGuest);
             IQueryable<EventGuest> eventGuests = _uut.GetEventGuests().Result;
 
             bool result = eventGuests
-                .Any(eg => (eg.Event_Pin == eventPin) && 
-                           (eg.Guest_Id == guestId));
+                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
+                           (eg.Guest_Id == eventGuest.Guest_Id));
+
+            
 
             Assert.True(result);
         }
 
-        //TODO: Missing test of the rest of EventGuest 
 
         [Test, TestCaseSource("EventGuestSource")]
-        public void GetEventGuestByEventPin(EventGuest eventGuest)
+        public void InsertEventGuest_InsertAndFind_returnsTrue(EventGuest eventGuest)
         {
 
+            _uut.InsertEventGuest(eventGuest);
+            IQueryable<EventGuest> eventGuests = _uut.GetEventGuests().Result;
+
+            bool result = eventGuests
+                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
+                           (eg.Guest_Id == eventGuest.Guest_Id));
+
+            
+
+            Assert.True(result);
+        }
+        [Test, TestCaseSource("EventGuestSource")]
+        public void GetEventGuestByEventPin_InsertAndFind_returnsTrue(EventGuest eventGuest)
+        {
+            _uut.InsertEventGuest(eventGuest);
+
+            IQueryable<EventGuest> eventGuests = _uut.GetEventGuestsByEventPin(eventGuest.Event_Pin).Result;
+
+            bool result = eventGuests
+                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
+                           (eg.Guest_Id == eventGuest.Guest_Id));
+
+            
+
+            Assert.True(result);
         }
 
+        [Test, TestCaseSource("EventGuestSource")]
+        public void GetEventGuestByGuestId_InsertAndFind_returnsTrue(EventGuest eventGuest)
+        {
+            
+                _uut.InsertEventGuest(eventGuest);
+
+            IQueryable<EventGuest> eventGuests = _uut.GetEventGuestsByGuestId(eventGuest.Guest_Id).Result;
+
+            bool result = eventGuests
+                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
+                           (eg.Guest_Id == eventGuest.Guest_Id));
+
+
+            Assert.True(result);
+        }
+
+        [Test, TestCaseSource("EventGuestSource")]
+        public void DeleteEventguest_InsertDeleteFind_ReturnsNull(EventGuest eventGuest)
+        {
+            _uut.InsertEventGuest(eventGuest);
+
+            _uut.DeleteEventGuest(eventGuest);
+
+            var result = _uut.GetEventGuestsByEventPin(eventGuest.Event_Pin).Result;
+
+           Assert.AreEqual(null, result);
+        }
         #endregion
 
         #region Failure/Corner Tests

@@ -9,24 +9,9 @@
 
   <ItemGroup>
     <Compile Remove="Commands.cs" />
-    <Compile Remove="Migrations\20190318080059_InitialCreate.cs" />
-    <Compile Remove="Migrations\20190318080338_Initial.cs" />
-    <Compile Remove="Migrations\20190318080632_Initial.cs" />
-    <Compile Remove="Migrations\20190318092231_Base.cs" />
-    <Compile Remove="Migrations\20190331132335_Updated-Properties.cs" />
-    <Compile Remove="Migrations\20190331133800_Base.cs" />
-    <Compile Remove="Migrations\20190331133828_Base.cs" />
-    <Compile Remove="Migrations\20190331134600_Base.cs" />
-    <Compile Remove="Migrations\20190331135228_Property-Updates.cs" />
-    <Compile Remove="Migrations\20190331141925_Added-Validation.cs" />
-    <Compile Remove="Migrations\20190331151723_Properties-updated.cs" />
-    <Compile Remove="Migrations\20190331151921_base.cs" />
-    <Compile Remove="Migrations\20190331152246_Base.cs" />
-    <Compile Remove="Migrations\20190331152428_Base.cs" />
-    <Compile Remove="Migrations\20190331154105_Base.cs" />
-    <Compile Remove="Migrations\20190331154744_base.cs" />
-    <Compile Remove="Migrations\20190331155248_base.cs" />
-    <Compile Remove="Migrations\20190401175955_Base.cs" />
+    <Compile Remove="Migrations\20190402195218_Bas.cs" />
+    <Compile Remove="Migrations\20190402202946_Initial.cs" />
+    <Compile Remove="Migrations\20190402205202_Base.cs" />
     <Compile Remove="Model\EventGuests.cs" />
     <Compile Remove="Program.cs" />
   </ItemGroup>

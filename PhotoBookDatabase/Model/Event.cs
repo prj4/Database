@@ -27,6 +27,5 @@ namespace PhotoBookDatabase.Model
         public Host Host { get; set; }
         public List<Picture> Pictures { get; set; }
 
-        
     }
 }

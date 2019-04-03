@@ -13,12 +13,12 @@ namespace PhotoBook.Repository.EventRepository
 {
     public class EventRepository : IEventRepository
     {
-        private PhotoBookDbContext _context;
+        
         private DbContextOptions<PhotoBookDbContext> _options;
 
         internal EventRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = new PhotoBookDbContext(options);
+            _options = options;
         }
 
 
@@ -27,36 +27,46 @@ namespace PhotoBook.Repository.EventRepository
             _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
                 .UseSqlServer(connectionString)
                 .Options;
-
-            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
 
         private async Task<bool> IfAny()
         {
-            bool result = await _context.Events.AnyAsync();
-            return result;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                bool result = await context.Events.AnyAsync();
+                return result;
+            }
         }
         private async Task<bool> Exists(Event eve)
         {
-            bool result = await _context.Events.AnyAsync(e => e.HostId == eve.HostId); 
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                bool result = await context.Events.AnyAsync(e => e.HostId == eve.HostId);
 
-            return result;
+                return result;
+            }
         }
         private async Task<bool> Exists(int pin)
         {
-            if (await _context.Events
-                .AnyAsync(e=> e.Pin == pin))
-                return true;
-            return false;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (await context.Events
+                    .AnyAsync(e => e.Pin == pin))
+                    return true;
+                return false;
+            }
         }
         private async Task<bool> Exists(string name)
         {
-            if (await _context.Events
-                .AnyAsync(e => e.Name == name))
-                return true;
-            return false;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (await context.Events
+                    .AnyAsync(e => e.Name == name))
+                    return true;
+                return false;
+            }
         }
         
 
@@ -68,10 +78,13 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (IfAny().Result)
             {
-                var events = await _context.Events.ToListAsync();
-                return events.AsQueryable();
-            }
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
+                    var events = await context.Events.ToListAsync();
+                    return events.AsQueryable();
+                }
+            }
             return null;
         }
 
@@ -79,32 +92,42 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (Exists(eventPin).Result)
             {
-                var eve = await _context.Events
-                    .FindAsync(eventPin);
-                return eve;
-            }
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
+                    var eve = await context.Events
+                        .FindAsync(eventPin);
+                    return eve;
+                }
+            }
             return null;
         }
 
         public async Task<Event> GetEvent(string name)
         {
-            if (Exists(name).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                var eve = await _context.Events
-                    .Where(x => x.Name == name)
-                    .FirstOrDefaultAsync();
-                return eve;
+                if (Exists(name).Result)
+                {
+                    var eve = await context.Events
+                        .Where(x => x.Name == name)
+                        .FirstOrDefaultAsync();
+                    return eve;
+                }
+
+                return null;
             }
-            return null;
         }
 
         public async void InsertEvent(Event eve)
         {
             if (!Exists(eve).Result)
             {
-                await _context.Events.AddAsync(eve);
-                await _context.SaveChangesAsync();
+                using (var context = new PhotoBookDbContext(_options))
+                {
+                    await context.Events.AddAsync(eve);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
@@ -112,11 +135,14 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (Exists(pin).Result)
             {
-                var eve = _context.Events
-                    .FindAsync(pin).Result;
+                using (var context = new PhotoBookDbContext(_options))
+                {
+                    var eve = context.Events
+                        .FindAsync(pin).Result;
 
-                _context.Events.Remove(eve);
-                await _context.SaveChangesAsync();
+                    context.Events.Remove(eve);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
@@ -124,12 +150,16 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (Exists(name).Result)
             {
-                var eve = _context.Events
-                    .Where(x => x.Name == name)
-                    .FirstOrDefaultAsync().Result;
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                _context.Events.Remove(eve);
-                await _context.SaveChangesAsync();
+                    var eve = context.Events
+                        .Where(x => x.Name == name)
+                        .FirstOrDefaultAsync().Result;
+
+                    context.Events.Remove(eve);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
@@ -137,20 +167,23 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (Exists(eve).Result)
             {
-                var entity = await _context.Events.FindAsync(eve.Pin);
-                
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                entity.Description = eve.Description;
-                entity.Name = eve.Name;
-                entity.Pin = eve.Pin;
-                entity.EndDate = eve.EndDate;
-                entity.StartDate = eve.StartDate;
-                entity.Location = eve.Location;
+                    var entity = await context.Events.FindAsync(eve.Pin);
 
-                _context.Update(entity);
+                    entity.Description = eve.Description;
+                    entity.Name = eve.Name;
+                    entity.Pin = eve.Pin;
+                    entity.EndDate = eve.EndDate;
+                    entity.StartDate = eve.StartDate;
+                    entity.Location = eve.Location;
+
+                    context.Update(entity);
 
 
-                await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
+                }
             }
         }
         #endregion

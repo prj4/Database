@@ -1,29 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
-using PhotoBook.Repository.EventRepository;
 using PhotoBook.Repository.GuestRepository;
-using PhotoBook.Repository.HostRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace Repository.Test
+namespace PhotoBook.Test.Repository.Azure
 {
     class GuestRepositoryTest
     {
         private IGuestRepository _uut;
-        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+        private string _connectionString =
+            "Server=tcp:katrinesphotobook.database.windows.net,1433;Initial Catalog=PhotoBook4;" +
+            "Persist Security Info=False;User ID=Ingeniørhøjskolen@katrinesphotobook.database.windows.net;" +
+            "Password=Katrinebjergvej22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
         public GuestRepositoryTest()
         {
-            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .Options;
+            
         }
 
         #region Sources
@@ -41,7 +37,7 @@ namespace Repository.Test
         [SetUp]
         public void Setup()
         {
-            _uut = new GuestRepository(_InMemoryOptions);
+            _uut = new GuestRepository(_connectionString);
         }
 
         [TearDown]

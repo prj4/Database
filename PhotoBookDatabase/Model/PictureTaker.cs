@@ -8,12 +8,10 @@ namespace PhotoBookDatabase.Model
 {
     public class PictureTaker
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int PictureTakerId { get; set; }
+        [Required]
         public String Name { get; set; }
         public List<Picture> Pictures { get; set; }
-
-        
     }
 }

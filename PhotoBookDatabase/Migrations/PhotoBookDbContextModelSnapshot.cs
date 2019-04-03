@@ -54,7 +54,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation1",
                             Name = "Event1",
-                            StartDate = new DateTime(2019, 4, 2, 22, 55, 49, 94, DateTimeKind.Local).AddTicks(7935)
+                            StartDate = new DateTime(2019, 4, 3, 19, 53, 35, 685, DateTimeKind.Local).AddTicks(9322)
                         },
                         new
                         {
@@ -64,7 +64,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation2",
                             Name = "Event2",
-                            StartDate = new DateTime(2019, 4, 2, 22, 55, 49, 97, DateTimeKind.Local).AddTicks(5912)
+                            StartDate = new DateTime(2019, 4, 3, 19, 53, 35, 692, DateTimeKind.Local).AddTicks(4993)
                         },
                         new
                         {
@@ -74,37 +74,37 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation3",
                             Name = "Event3",
-                            StartDate = new DateTime(2019, 4, 2, 22, 55, 49, 97, DateTimeKind.Local).AddTicks(5929)
+                            StartDate = new DateTime(2019, 4, 3, 19, 53, 35, 692, DateTimeKind.Local).AddTicks(5014)
                         });
                 });
 
             modelBuilder.Entity("PhotoBookDatabase.Model.EventGuest", b =>
                 {
-                    b.Property<int>("Event_Pin");
+                    b.Property<int>("EventPin");
 
-                    b.Property<int>("Guest_Id");
+                    b.Property<int>("GuestId");
 
-                    b.HasKey("Event_Pin", "Guest_Id");
+                    b.HasKey("EventPin", "GuestId");
 
-                    b.HasIndex("Guest_Id");
+                    b.HasIndex("GuestId");
 
                     b.ToTable("EventGuests");
 
                     b.HasData(
                         new
                         {
-                            Event_Pin = 1,
-                            Guest_Id = 4
+                            EventPin = 1,
+                            GuestId = 4
                         },
                         new
                         {
-                            Event_Pin = 2,
-                            Guest_Id = 5
+                            EventPin = 2,
+                            GuestId = 5
                         },
                         new
                         {
-                            Event_Pin = 3,
-                            Guest_Id = 6
+                            EventPin = 3,
+                            GuestId = 6
                         });
                 });
 
@@ -116,15 +116,16 @@ namespace PhotoBookDatabase.Migrations
 
                     b.Property<int>("EventPin");
 
-                    b.Property<int>("Taker");
+                    b.Property<int>("TakerId");
 
-                    b.Property<string>("URL");
+                    b.Property<string>("URL")
+                        .IsRequired();
 
                     b.HasKey("PictureId");
 
                     b.HasIndex("EventPin");
 
-                    b.HasIndex("Taker");
+                    b.HasIndex("TakerId");
 
                     b.ToTable("Pictures");
 
@@ -133,21 +134,21 @@ namespace PhotoBookDatabase.Migrations
                         {
                             PictureId = 1,
                             EventPin = 1,
-                            Taker = 1,
+                            TakerId = 1,
                             URL = "wwwroot/Images/1.png"
                         },
                         new
                         {
                             PictureId = 2,
                             EventPin = 2,
-                            Taker = 2,
+                            TakerId = 2,
                             URL = "wwwroot/Images/2.png"
                         },
                         new
                         {
                             PictureId = 3,
                             EventPin = 3,
-                            Taker = 3,
+                            TakerId = 3,
                             URL = "wwwroot/Images/3.png"
                         });
                 });
@@ -161,7 +162,8 @@ namespace PhotoBookDatabase.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.HasKey("PictureTakerId");
 
@@ -201,19 +203,9 @@ namespace PhotoBookDatabase.Migrations
                     b.Property<string>("Email")
                         .IsRequired();
 
-                    b.Property<string>("PW")
-                        .IsRequired();
-
-                    b.Property<string>("Username")
-                        .IsRequired();
-
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasFilter("[Email] IS NOT NULL");
-
-                    b.HasIndex("Username")
-                        .IsUnique()
-                        .HasFilter("[Username] IS NOT NULL");
 
                     b.HasDiscriminator().HasValue("Host");
 
@@ -221,26 +213,20 @@ namespace PhotoBookDatabase.Migrations
                         new
                         {
                             PictureTakerId = 1,
-                            Name = "Host",
-                            Email = "Email1@email.com",
-                            PW = "PWPWPWPWPW1",
-                            Username = "Username1"
+                            Name = "Host1",
+                            Email = "Email1@email.com"
                         },
                         new
                         {
                             PictureTakerId = 2,
                             Name = "Host2",
-                            Email = "Email2@email.com",
-                            PW = "PWPWPWPWPW2",
-                            Username = "Username2"
+                            Email = "Email2@email.com"
                         },
                         new
                         {
                             PictureTakerId = 3,
                             Name = "Host3",
-                            Email = "Email3@email.com",
-                            PW = "PWPWPWPWPW3",
-                            Username = "Username3"
+                            Email = "Email3@email.com"
                         });
                 });
 
@@ -256,12 +242,12 @@ namespace PhotoBookDatabase.Migrations
                 {
                     b.HasOne("PhotoBookDatabase.Model.Event", "Event")
                         .WithMany("EventGuests")
-                        .HasForeignKey("Event_Pin")
+                        .HasForeignKey("EventPin")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhotoBookDatabase.Model.Guest", "Guest")
                         .WithMany("EventGuests")
-                        .HasForeignKey("Guest_Id")
+                        .HasForeignKey("GuestId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
@@ -274,7 +260,7 @@ namespace PhotoBookDatabase.Migrations
 
                     b.HasOne("PhotoBookDatabase.Model.PictureTaker", "PictureTaker")
                         .WithMany("Pictures")
-                        .HasForeignKey("Taker")
+                        .HasForeignKey("TakerId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618

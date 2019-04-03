@@ -13,12 +13,13 @@ namespace PhotoBook.Repository.EventGuestRepository
 {
     public class EventGuestRepository : IEventGuestRepository
     {
-        private PhotoBookDbContext _context;
+        
         private DbContextOptions<PhotoBookDbContext> _options;
 
         internal EventGuestRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = new PhotoBookDbContext(options);
+
+            _options = options;
         }
 
         public EventGuestRepository(string connectionString)
@@ -26,37 +27,47 @@ namespace PhotoBook.Repository.EventGuestRepository
             _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
                 .UseSqlServer(connectionString)
                 .Options;
-
-            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
 
         private async Task<bool> IfAny()
         {
-            bool result = await _context.EventGuests.AnyAsync();
-            return result;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                bool result = await context.EventGuests.AnyAsync();
+                return result;
+            }
         }
         private async Task<bool> Exists(EventGuest eventGuest)
         {
-            bool result = await _context.EventGuests
-                .AnyAsync(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
-                                         (eg.Guest_Id == eventGuest.Guest_Id));
-            return result;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                bool result = await context.EventGuests
+                    .AnyAsync(eg => (eg.EventPin == eventGuest.EventPin) &&
+                                    (eg.GuestId == eventGuest.GuestId));
+                return result;
+            }
         }
         private async Task<bool> ExistsByEventPin(int eventPin)
         {
-            if (await _context.EventGuests
-                .AnyAsync(eg => eg.Event_Pin == eventPin))
-                return true;
-            return false;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (await context.EventGuests
+                    .AnyAsync(eg => eg.EventPin == eventPin))
+                    return true;
+                return false;
+            }
         }
         private async Task<bool> ExistsByGuestId(int guestId)
         {
-            if (await _context.EventGuests
-                .AnyAsync(eg => eg.Guest_Id == guestId))
-                return true;
-            return false;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (await context.EventGuests
+                    .AnyAsync(eg => eg.GuestId == guestId))
+                    return true;
+                return false;
+            }
         }
 
 
@@ -68,8 +79,12 @@ namespace PhotoBook.Repository.EventGuestRepository
         {
             if (IfAny().Result)
             {
-                var eventGuests = await _context.EventGuests.ToListAsync();
-                return eventGuests.AsQueryable();
+                using (var context = new PhotoBookDbContext(_options))
+                {
+
+                    var eventGuests = await context.EventGuests.ToListAsync();
+                    return eventGuests.AsQueryable();
+                }
             }
             return null;
         }
@@ -78,35 +93,43 @@ namespace PhotoBook.Repository.EventGuestRepository
         {
             if (ExistsByEventPin(eventPin).Result)
             {
-                var eventGuests = await _context.EventGuests.
-                    Where(eg => eg.Event_Pin == eventPin).
-                    ToListAsync();
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                return eventGuests.AsQueryable();
+                    var eventGuests = await context.EventGuests.Where(eg => eg.EventPin == eventPin).ToListAsync();
+
+                    return eventGuests.AsQueryable();
+                }
             }
-
             return null;
+            
         }
 
         public async Task<IQueryable<EventGuest>> GetEventGuestsByGuestId(int guestId)
         {
             if (ExistsByGuestId(guestId).Result)
             {
-                var eventGuests = await _context.EventGuests.
-                    Where(eg => eg.Guest_Id == guestId).
-                    ToListAsync();
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                return eventGuests.AsQueryable();
+                    var eventGuests = await context.EventGuests.Where(eg => eg.GuestId == guestId).ToListAsync();
+
+                    return eventGuests.AsQueryable();
+                }
             }
             return null;
+            
         }
 
         public async void InsertEventGuest(EventGuest eventGuest)
         {
             if (!Exists(eventGuest).Result)
             {
-                await _context.EventGuests.AddAsync(eventGuest);
-                await _context.SaveChangesAsync();
+                using (var context = new PhotoBookDbContext(_options))
+                {
+                    await context.EventGuests.AddAsync(eventGuest);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
@@ -114,12 +137,15 @@ namespace PhotoBook.Repository.EventGuestRepository
         {
             if (Exists(eventGuest).Result)
             {
-                var eg = _context.EventGuests
-                    .FindAsync(eventGuest.Event_Pin,eventGuest.Guest_Id).Result;
+                using (var context = new PhotoBookDbContext(_options))
+                {
+                    var eg = context.EventGuests
+                        .FindAsync(eventGuest.EventPin, eventGuest.GuestId).Result;
 
-                _context.EventGuests.Remove(eventGuest);
+                    context.EventGuests.Remove(eg);
 
-                await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
+                }
             }
         }
         #endregion

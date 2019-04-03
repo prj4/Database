@@ -16,9 +16,6 @@ namespace PhotoBook.Repository.HostRepository
         void InsertHost(Host host);
         void DeleteHost(int hostId);
         void DeleteHost(string hostName);
-        void UpdateHost(Host host, string email);
-        void UpdateHost(Host host, string email, string password);
-
-
+        void UpdateHost(Host host);
     }
 }

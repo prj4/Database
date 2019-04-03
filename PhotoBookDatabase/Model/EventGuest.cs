@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace PhotoBookDatabase.Model
 {
     public class EventGuest
     {
-        public int Guest_Id { get; set; }
+        [Required]
+        public int GuestId { get; set; }
         public Guest Guest { get; set; }
-
-        public int Event_Pin { get; set; }
+        [Required]
+        public int EventPin { get; set; }
         public Event Event { get; set; }
     }
 }

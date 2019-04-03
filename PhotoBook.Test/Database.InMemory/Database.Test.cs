@@ -1,16 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.InMemory.Storage.Internal;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
-
 using PhotoBookDatabase.Data;
-using PhotoBookDatabase.Model;
 
-namespace Database.Test
+namespace PhotoBook.Test.Database.InMemory
 {
     public class DatabaseTest
     {
@@ -42,18 +36,18 @@ namespace Database.Test
 
         #region Creation/Read Tests
         
-        [TestCase("Username1")]
-        [TestCase("Username2")]
-        [TestCase("Username3")]
-        public void CreationOfHost_SearchingOnUserName_ReturnsTrue(string userName)
+        [TestCase("Host1")]
+        [TestCase("Host2")]
+        [TestCase("Host3")]
+        public void CreationOfHost_SearchingOnUserName_ReturnsTrue(string name)
         {
            
 
                 var result = _context.Hosts
-                    .Where(x => x.Username == userName)
-                    .FirstOrDefault().Username;
+                    .Where(x => x.Name == name)
+                    .FirstOrDefault().Name;
 
-                Assert.AreEqual(result,userName);
+                Assert.AreEqual(result,name);
         }
 
 
@@ -102,8 +96,8 @@ namespace Database.Test
         public void CreationOfEventGuest_SearchingOnEventPin_ReturnsTrueOnGuestId(int eventPin, int guestId)
         {
             var result = _context.EventGuests
-                .Where(eg => eg.Event_Pin == eventPin)
-                .FirstOrDefault().Guest_Id;
+                .Where(eg => eg.EventPin == eventPin)
+                .FirstOrDefault().GuestId;
 
             Assert.AreEqual(guestId, result);
 

@@ -50,22 +50,22 @@ namespace PhotoBookDatabase.Data
 
         private void EventGuestOnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<EventGuest>().HasKey(eg => new {eg.Event_Pin, eg.Guest_Id});
+            modelBuilder.Entity<EventGuest>().HasKey(eg => new {eg.EventPin, eg.GuestId});
 
             modelBuilder.Entity<EventGuest>()
                 .HasOne<Event>(sc => sc.Event)
                 .WithMany(s => s.EventGuests)
-                .HasForeignKey(sc => sc.Event_Pin);
+                .HasForeignKey(sc => sc.EventPin);
 
             modelBuilder.Entity<EventGuest>()
                 .HasOne<Guest>(sc => sc.Guest)
                 .WithMany(s => s.EventGuests)
-                .HasForeignKey(sc => sc.Guest_Id);
+                .HasForeignKey(sc => sc.GuestId);
 
             modelBuilder.Entity<EventGuest>().HasData(
-                new EventGuest { Event_Pin = 1, Guest_Id = 4 },
-                new EventGuest { Event_Pin = 2, Guest_Id = 5 },
-                new EventGuest { Event_Pin = 3, Guest_Id = 6 }
+                new EventGuest { EventPin = 1, GuestId = 4 },
+                new EventGuest { EventPin = 2, GuestId = 5 },
+                new EventGuest { EventPin = 3, GuestId = 6 }
             );
 
         }
@@ -107,8 +107,7 @@ namespace PhotoBookDatabase.Data
                 .WithOne(e => e.Host)
                 .HasForeignKey(e => e.HostId);
 
-            modelBuilder.Entity<Host>(h => 
-                h.HasIndex(u => u.Username).IsUnique());
+            
 
             modelBuilder.Entity<Host>(h =>
                 h.HasIndex(e => e.Email).IsUnique());
@@ -117,17 +116,17 @@ namespace PhotoBookDatabase.Data
                 .HasData(
                     new Host
                     {
-                        Email = "Email1@email.com", Name = "Host", Username = "Username1", PW = "PWPWPWPWPW1",
+                        Email = "Email1@email.com", Name = "Host1",
                         PictureTakerId = 1
                     },
                     new Host
                     {
-                        Email = "Email2@email.com", Name = "Host2", Username = "Username2", PW = "PWPWPWPWPW2",
+                        Email = "Email2@email.com", Name = "Host2",
                         PictureTakerId = 2
                     },
                     new Host
                     {
-                        Email = "Email3@email.com", Name = "Host3", Username = "Username3", PW = "PWPWPWPWPW3",
+                        Email = "Email3@email.com", Name = "Host3",
                         PictureTakerId = 3
                     }
                 );
@@ -139,13 +138,13 @@ namespace PhotoBookDatabase.Data
             modelBuilder.Entity<Picture>()
                 .HasOne(p => p.PictureTaker)
                 .WithMany(p => p.Pictures)
-                .HasForeignKey(p => p.Taker);
+                .HasForeignKey(p => p.TakerId);
 
             modelBuilder.Entity<Picture>()
                 .HasData(
-                    new Picture {PictureId = 1, EventPin = 1, Taker = 1, URL = "wwwroot/Images/1.png"},
-                    new Picture {PictureId = 2, EventPin = 2, Taker = 2, URL = "wwwroot/Images/2.png"},
-                    new Picture {PictureId = 3, EventPin = 3, Taker = 3, URL = "wwwroot/Images/3.png"}
+                    new Picture {PictureId = 1, EventPin = 1, TakerId = 1, URL = "wwwroot/Images/1.png"},
+                    new Picture {PictureId = 2, EventPin = 2, TakerId = 2, URL = "wwwroot/Images/2.png"},
+                    new Picture {PictureId = 3, EventPin = 3, TakerId = 3, URL = "wwwroot/Images/3.png"}
                 );
         }
     }

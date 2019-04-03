@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
@@ -9,7 +7,7 @@ using PhotoBook.Repository.EventGuestRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace Repository.Test
+namespace PhotoBook.Test.Repository.InMemory
 {
     class EventGuestRepositoryTest
     {
@@ -26,9 +24,9 @@ namespace Repository.Test
         #region Sources
         private static EventGuest[] EventGuestSource =
         {
-            new EventGuest {Event_Pin = 3, Guest_Id = 1},
-            new EventGuest {Event_Pin = 3, Guest_Id = 2},
-            new EventGuest {Event_Pin = 3, Guest_Id = 3}
+            new EventGuest {EventPin = 3, GuestId = 1},
+            new EventGuest {EventPin = 3, GuestId = 2},
+            new EventGuest {EventPin = 3, GuestId = 3}
         };
 
         #endregion
@@ -56,8 +54,8 @@ namespace Repository.Test
             IQueryable<EventGuest> eventGuests = _uut.GetEventGuests().Result;
 
             bool result = eventGuests
-                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
-                           (eg.Guest_Id == eventGuest.Guest_Id));
+                .Any(eg => (eg.EventPin == eventGuest.EventPin) &&
+                           (eg.GuestId == eventGuest.GuestId));
 
             
 
@@ -73,8 +71,8 @@ namespace Repository.Test
             IQueryable<EventGuest> eventGuests = _uut.GetEventGuests().Result;
 
             bool result = eventGuests
-                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
-                           (eg.Guest_Id == eventGuest.Guest_Id));
+                .Any(eg => (eg.EventPin == eventGuest.EventPin) &&
+                           (eg.GuestId == eventGuest.GuestId));
 
             
 
@@ -85,11 +83,11 @@ namespace Repository.Test
         {
             _uut.InsertEventGuest(eventGuest);
 
-            IQueryable<EventGuest> eventGuests = _uut.GetEventGuestsByEventPin(eventGuest.Event_Pin).Result;
+            IQueryable<EventGuest> eventGuests = _uut.GetEventGuestsByEventPin(eventGuest.EventPin).Result;
 
             bool result = eventGuests
-                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
-                           (eg.Guest_Id == eventGuest.Guest_Id));
+                .Any(eg => (eg.EventPin == eventGuest.EventPin) &&
+                           (eg.GuestId == eventGuest.GuestId));
 
             
 
@@ -102,11 +100,11 @@ namespace Repository.Test
             
                 _uut.InsertEventGuest(eventGuest);
 
-            IQueryable<EventGuest> eventGuests = _uut.GetEventGuestsByGuestId(eventGuest.Guest_Id).Result;
+            IQueryable<EventGuest> eventGuests = _uut.GetEventGuestsByGuestId(eventGuest.GuestId).Result;
 
             bool result = eventGuests
-                .Any(eg => (eg.Event_Pin == eventGuest.Event_Pin) &&
-                           (eg.Guest_Id == eventGuest.Guest_Id));
+                .Any(eg => (eg.EventPin == eventGuest.EventPin) &&
+                           (eg.GuestId == eventGuest.GuestId));
 
 
             Assert.True(result);
@@ -119,7 +117,7 @@ namespace Repository.Test
 
             _uut.DeleteEventGuest(eventGuest);
 
-            var result = _uut.GetEventGuestsByEventPin(eventGuest.Event_Pin).Result;
+            var result = _uut.GetEventGuestsByEventPin(eventGuest.EventPin).Result;
 
            Assert.AreEqual(null, result);
         }

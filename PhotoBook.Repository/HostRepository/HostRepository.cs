@@ -15,15 +15,14 @@ using PhotoBookDatabase.Model;
 
     namespace PhotoBook.Repository.HostRepository
 {
-    public class HostRepository : IHostRepository
+    public class HostRepository : IHostRepository 
     {
-        private PhotoBookDbContext _context;
         private DbContextOptions<PhotoBookDbContext> _options;
 
         /*Constructor needed for test with InMemory*/
         internal HostRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = new PhotoBookDbContext(options);
+            _options = options;
         }
 
 
@@ -32,35 +31,45 @@ using PhotoBookDatabase.Model;
             _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
                 .UseSqlServer(connectionString)
                 .Options;
-
-            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
 
         private async Task<bool> IfAny()
         {
-           bool result = await _context.Hosts.AnyAsync();
-           return result;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                bool result = await context.Hosts.AnyAsync();
+                return result;
+            }
         }
         private async Task<bool> Exists(Host host)
         {
-            bool result = await _context.Hosts.AnyAsync(h => h.PictureTakerId == host.PictureTakerId);
-            return result;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                bool result = await context.Hosts.AnyAsync(h => h.PictureTakerId == host.PictureTakerId);
+                return result;
+            }
         }
         private async Task<bool> Exists(int id)
         {
-            if (await _context.Hosts
-                .AnyAsync(h => h.PictureTakerId == id))
-                return true;
-            return false;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (await context.Hosts
+                    .AnyAsync(h => h.PictureTakerId == id))
+                    return true;
+                return false;
+            }
         }
         private async Task<bool> Exists(string name)
         {
-            if (await _context.Hosts
-                .AnyAsync(h => h.Name == name))
-                return true;
-            return false;
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (await context.Hosts
+                    .AnyAsync(h => h.Name == name))
+                    return true;
+                return false;
+            }
         }
 
 
@@ -75,11 +84,13 @@ using PhotoBookDatabase.Model;
         {
             if (IfAny().Result)
             {
-                var hosts = await _context.Hosts.ToListAsync();
-                
-                return hosts.AsQueryable();
-            }
+                using (var context = new PhotoBookDbContext(_options))
+                {
+                    var hosts = await context.Hosts.ToListAsync();
 
+                    return hosts.AsQueryable();
+                }  
+            }
             return null;
         }
 
@@ -87,10 +98,14 @@ using PhotoBookDatabase.Model;
         {
             if (Exists(hostId).Result)
             {
-                var host = await _context.Hosts
-                    .FindAsync(hostId);
-                
-                return host;
+                using (var context = new PhotoBookDbContext(_options))
+                {
+
+                    var host = await context.Hosts
+                        .FindAsync(hostId);
+
+                    return host;
+                }
             }
 
             return null;
@@ -100,11 +115,15 @@ using PhotoBookDatabase.Model;
         {
             if (Exists(hostName).Result)
             {
-                var host = await _context.Hosts
-                    .Where(x => x.Name == hostName)
-                    .FirstOrDefaultAsync();
-                
-                return host;
+                using (var context = new PhotoBookDbContext(_options))
+                {
+
+                    var host = await context.Hosts
+                        .Where(x => x.Name == hostName)
+                        .FirstOrDefaultAsync();
+
+                    return host;
+                }
             }
 
             return null;
@@ -114,8 +133,12 @@ using PhotoBookDatabase.Model;
         {
             if (!Exists(host).Result)
             {
-                await _context.Hosts.AddAsync(host);
-                await _context.SaveChangesAsync();
+                using (var context = new PhotoBookDbContext(_options))
+                {
+
+                    await context.Hosts.AddAsync(host);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
@@ -123,11 +146,15 @@ using PhotoBookDatabase.Model;
         {
             if (Exists(hostId).Result)
             {
-                var host = _context.Hosts
-                    .FindAsync(hostId).Result;
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                _context.Hosts.Remove(host);
-                await _context.SaveChangesAsync();
+                    var host = context.Hosts
+                        .FindAsync(hostId).Result;
+
+                    context.Hosts.Remove(host);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
@@ -135,45 +162,38 @@ using PhotoBookDatabase.Model;
         {
             if (Exists(hostName).Result)
             {
-                var host = _context.Hosts
-                    .Where(x => x.Name == hostName)
-                    .FirstOrDefaultAsync().Result;
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                _context.Hosts.Remove(host);
-                await _context.SaveChangesAsync();
+                    var host = context.Hosts
+                        .Where(x => x.Name == hostName)
+                        .FirstOrDefaultAsync().Result;
+
+                    context.Hosts.Remove(host);
+                    await context.SaveChangesAsync();
+                }
             }
         }
 
-        public async void UpdateHost(Host host, string email)
+        public async void UpdateHost(Host host)
         {
             if (Exists(host).Result)
             {
-                var entity = await _context.Hosts.FirstOrDefaultAsync(
-                    h => h.PictureTakerId == host.PictureTakerId);
+                using (var context = new PhotoBookDbContext(_options))
+                {
 
-                entity.Email = email;
+                    var entity = await context.Hosts.FirstOrDefaultAsync(
+                        h => h.PictureTakerId == host.PictureTakerId);
 
-                await _context.SaveChangesAsync();
+                    entity.Email = host.Email;
+                    entity.Name = host.Name;
+
+                    context.Update(entity);
+
+                    await context.SaveChangesAsync();
+                }
             }
         }
-
-        public async void UpdateHost(Host host, string email, string password)
-        {
-            if (Exists(host).Result)
-            {
-                var entity = await _context.Hosts.FirstOrDefaultAsync(
-                    h => h.PictureTakerId == host.PictureTakerId);
-
-                entity.Email = email;
-                entity.PW = password;
-
-                await _context.SaveChangesAsync();
-            }
-
-            return;
-        }
-
-        
         #endregion
     }
 }

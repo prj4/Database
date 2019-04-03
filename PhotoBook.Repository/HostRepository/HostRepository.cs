@@ -1,20 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Options;
+using PhotoBook.Repository.HostRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace PhotoBook.Repository.HostRepository
+[assembly: InternalsVisibleTo("PhotoBook.Test")]
+
+    namespace PhotoBook.Repository.HostRepository
 {
     public class HostRepository : IHostRepository
     {
         private PhotoBookDbContext _context;
-        public HostRepository(PhotoBookDbContext context)
+        private DbContextOptions<PhotoBookDbContext> _options;
+
+        /*Constructor needed for test with InMemory*/
+        internal HostRepository(DbContextOptions<PhotoBookDbContext> options)
         {
-            _context = context;
+            _context = new PhotoBookDbContext(options);
+        }
+
+
+        public HostRepository(string connectionString)
+        {
+            _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseSqlServer(connectionString)
+                .Options;
+
+            _context = new PhotoBookDbContext(_options);
         }
 
         #region Private Methods
@@ -26,7 +45,7 @@ namespace PhotoBook.Repository.HostRepository
         }
         private async Task<bool> Exists(Host host)
         {
-            bool result = await _context.Hosts.ContainsAsync(host);
+            bool result = await _context.Hosts.AnyAsync(h => h.PictureTakerId == host.PictureTakerId);
             return result;
         }
         private async Task<bool> Exists(int id)

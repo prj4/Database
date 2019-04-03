@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PhotoBookDatabase.Migrations
 {
-    public partial class Base : Migration
+    public partial class Inital : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -64,13 +64,13 @@ namespace PhotoBookDatabase.Migrations
                         column: x => x.Event_Pin,
                         principalTable: "Events",
                         principalColumn: "Pin",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_EventGuests_PictureTakers_Guest_Id",
                         column: x => x.Guest_Id,
                         principalTable: "PictureTakers",
                         principalColumn: "PictureTakerId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -98,6 +98,61 @@ namespace PhotoBookDatabase.Migrations
                         principalTable: "PictureTakers",
                         principalColumn: "PictureTakerId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "PictureTakers",
+                columns: new[] { "PictureTakerId", "Discriminator", "Name" },
+                values: new object[,]
+                {
+                    { 4, "Guest", "Guest1" },
+                    { 5, "Guest", "Guest2" },
+                    { 6, "Guest", "Guest3" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PictureTakers",
+                columns: new[] { "PictureTakerId", "Discriminator", "Name", "Email", "PW", "Username" },
+                values: new object[,]
+                {
+                    { 1, "Host", "Host", "Email1@email.com", "PWPWPWPWPW1", "Username1" },
+                    { 2, "Host", "Host2", "Email2@email.com", "PWPWPWPWPW2", "Username2" },
+                    { 3, "Host", "Host3", "Email3@email.com", "PWPWPWPWPW3", "Username3" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Events",
+                columns: new[] { "Pin", "Description", "EndDate", "HostId", "Location", "Name", "StartDate" },
+                values: new object[] { 1, "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 4, 2, 22, 55, 49, 94, DateTimeKind.Local).AddTicks(7935) });
+
+            migrationBuilder.InsertData(
+                table: "Events",
+                columns: new[] { "Pin", "Description", "EndDate", "HostId", "Location", "Name", "StartDate" },
+                values: new object[] { 2, "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 4, 2, 22, 55, 49, 97, DateTimeKind.Local).AddTicks(5912) });
+
+            migrationBuilder.InsertData(
+                table: "Events",
+                columns: new[] { "Pin", "Description", "EndDate", "HostId", "Location", "Name", "StartDate" },
+                values: new object[] { 3, "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 4, 2, 22, 55, 49, 97, DateTimeKind.Local).AddTicks(5929) });
+
+            migrationBuilder.InsertData(
+                table: "EventGuests",
+                columns: new[] { "Event_Pin", "Guest_Id" },
+                values: new object[,]
+                {
+                    { 1, 4 },
+                    { 2, 5 },
+                    { 3, 6 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Pictures",
+                columns: new[] { "PictureId", "EventPin", "Taker", "URL" },
+                values: new object[,]
+                {
+                    { 1, 1, 1, "wwwroot/Images/1.png" },
+                    { 2, 2, 2, "wwwroot/Images/2.png" },
+                    { 3, 3, 3, "wwwroot/Images/3.png" }
                 });
 
             migrationBuilder.CreateIndex(

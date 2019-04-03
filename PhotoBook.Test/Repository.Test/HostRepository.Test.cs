@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -7,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using PhotoBook.Repository.HostRepository;
-using PhotoBook.Test;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
@@ -15,8 +15,16 @@ namespace Repository.Test
 {
     class HostRepositoryTest
     {
-        private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IHostRepository _uut;
+        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+
+        public HostRepositoryTest()
+        {
+            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .Options;
+        }
 
         #region Sources
         private static Host[] HostSource =
@@ -30,28 +38,15 @@ namespace Repository.Test
 
         #region Setup and TearDown
 
-
-
-
         [SetUp]
         public void Setup()
         {
-            _inMemoryDatabaseHelper = new InMemoryDatabaseHelper("UnitTest");
-            _uut = new HostRepository(new PhotoBookDbContext(_inMemoryDatabaseHelper._options));
-
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureCreated();
-            }
+            _uut = new HostRepository(_InMemoryOptions);
         }
 
         [TearDown]
         public void TearDown()
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureDeleted();
-            }
         }
         #endregion
 
@@ -61,13 +56,6 @@ namespace Repository.Test
         [TestCase("Username3")]
         public void GetHosts_GettingListOfHostsAndFindingSpecific_ReturnsTrue(string username)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
-            }
-
-            
             IQueryable<Host> hosts = _uut.GetHosts().Result;
 
             bool result = hosts.Any(h => h.Username == username);
@@ -84,7 +72,7 @@ namespace Repository.Test
 
             IQueryable<Host> hosts = _uut.GetHosts().Result;
 
-            bool result = hosts.Any(h => h == host);
+            bool result = hosts.Any(h => h.PictureTakerId == host.PictureTakerId);
 
             Assert.True(result);
         }
@@ -104,7 +92,7 @@ namespace Repository.Test
             _uut.InsertHost(host);
             var tempHost = _uut.GetHost(host.Name).Result;
 
-            Assert.AreEqual(host, tempHost);
+            Assert.AreEqual(host.PictureTakerId, tempHost.PictureTakerId);
         }
 
         [Test, TestCaseSource("HostSource")]

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
 using PhotoBook.Repository.EventRepository;
 using PhotoBook.Repository.GuestRepository;
-using PhotoBook.Test;
+using PhotoBook.Repository.HostRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
@@ -13,8 +15,16 @@ namespace Repository.Test
 {
     class GuestRepositoryTest
     {
-        private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
         private IGuestRepository _uut;
+        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+
+        public GuestRepositoryTest()
+        {
+            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .Options;
+        }
 
         #region Sources
         private static Guest[] GuestSource =
@@ -31,22 +41,12 @@ namespace Repository.Test
         [SetUp]
         public void Setup()
         {
-            _inMemoryDatabaseHelper = new InMemoryDatabaseHelper("UnitTest");
-            _uut = new GuestRepository(new PhotoBookDbContext(_inMemoryDatabaseHelper._options));
-
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureCreated();
-            }
+            _uut = new GuestRepository(_InMemoryOptions);
         }
 
         [TearDown]
         public void TearDown()
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureDeleted();
-            }
         }
         #endregion
 
@@ -56,13 +56,6 @@ namespace Repository.Test
         [TestCase("Guest3")]
         public void GetGuests_GettingListOfGuestsAndFindingSpecific_ReturnsTrue(string name)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
-            }
-
-
             IQueryable<Guest> guests = _uut.GetGuests().Result;
 
             bool result = guests.Any(e => e.Name == name);
@@ -77,7 +70,7 @@ namespace Repository.Test
 
             IQueryable<Guest> guests = _uut.GetGuests().Result;
 
-            bool result = guests.Any(g => g == guest);
+            bool result = guests.Any(g => g.PictureTakerId == guest.PictureTakerId);
 
             Assert.True(result);
         }
@@ -97,7 +90,7 @@ namespace Repository.Test
             _uut.InsertGuest(guest);
             var result = _uut.GetGuest(guest.Name).Result;
 
-            Assert.AreEqual(guest, result);
+            Assert.AreEqual(guest.PictureTakerId, result.PictureTakerId);
         }
 
         [Test, TestCaseSource("GuestSource")]
@@ -147,7 +140,7 @@ namespace Repository.Test
         [Test]
         public void GetGuestById_TryingToGetNonExistingGuest_ReturnsNull()
         {
-            var result = _uut.GetGuest(1).Result;
+            var result = _uut.GetGuest(99).Result;
 
             Assert.AreEqual(null, result);
         }

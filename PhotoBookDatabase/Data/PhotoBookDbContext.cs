@@ -55,18 +55,31 @@ namespace PhotoBookDatabase.Data
             modelBuilder.Entity<EventGuest>()
                 .HasOne<Event>(sc => sc.Event)
                 .WithMany(s => s.EventGuests)
-                .HasForeignKey(sc => sc.Event_Pin).OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(sc => sc.Event_Pin);
 
             modelBuilder.Entity<EventGuest>()
                 .HasOne<Guest>(sc => sc.Guest)
                 .WithMany(s => s.EventGuests)
-                .HasForeignKey(sc => sc.Guest_Id).OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(sc => sc.Guest_Id);
+
+            modelBuilder.Entity<EventGuest>().HasData(
+                new EventGuest { Event_Pin = 1, Guest_Id = 4 },
+                new EventGuest { Event_Pin = 2, Guest_Id = 5 },
+                new EventGuest { Event_Pin = 3, Guest_Id = 6 }
+            );
+
         }
 
         void GuestOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Guest>()
                 .HasBaseType<PictureTaker>();
+
+            modelBuilder.Entity<Guest>().HasData(
+                new Guest { Name = "Guest1", PictureTakerId = 4 },
+                new Guest { Name = "Guest2", PictureTakerId = 5 },
+                new Guest { Name = "Guest3", PictureTakerId = 6 }
+                );
 
         }
 
@@ -76,6 +89,12 @@ namespace PhotoBookDatabase.Data
                 .HasMany(e => e.Pictures)
                 .WithOne(p => p.Event)
                 .HasForeignKey(p => p.EventPin);
+
+            modelBuilder.Entity<Event>().HasData(
+                new Event { Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = 1, StartDate = DateTime.Now, EndDate = DateTime.MaxValue },
+                new Event { Location = "Lokation2", Description = "Beskrivelse2", Name = "Event2", HostId = 2, Pin = 2, StartDate = DateTime.Now, EndDate = DateTime.MaxValue },
+                new Event { Location = "Lokation3", Description = "Beskrivelse3", Name = "Event3", HostId = 3, Pin = 3, StartDate = DateTime.Now, EndDate = DateTime.MaxValue }
+                );
         }
 
         void HostOnModelCreating(ModelBuilder modelBuilder)
@@ -94,6 +113,25 @@ namespace PhotoBookDatabase.Data
             modelBuilder.Entity<Host>(h =>
                 h.HasIndex(e => e.Email).IsUnique());
 
+            modelBuilder.Entity<Host>()
+                .HasData(
+                    new Host
+                    {
+                        Email = "Email1@email.com", Name = "Host", Username = "Username1", PW = "PWPWPWPWPW1",
+                        PictureTakerId = 1
+                    },
+                    new Host
+                    {
+                        Email = "Email2@email.com", Name = "Host2", Username = "Username2", PW = "PWPWPWPWPW2",
+                        PictureTakerId = 2
+                    },
+                    new Host
+                    {
+                        Email = "Email3@email.com", Name = "Host3", Username = "Username3", PW = "PWPWPWPWPW3",
+                        PictureTakerId = 3
+                    }
+                );
+
         }
 
         void PictureOnModelCreating(ModelBuilder modelBuilder)
@@ -102,6 +140,13 @@ namespace PhotoBookDatabase.Data
                 .HasOne(p => p.PictureTaker)
                 .WithMany(p => p.Pictures)
                 .HasForeignKey(p => p.Taker);
+
+            modelBuilder.Entity<Picture>()
+                .HasData(
+                    new Picture {PictureId = 1, EventPin = 1, Taker = 1, URL = "wwwroot/Images/1.png"},
+                    new Picture {PictureId = 2, EventPin = 2, Taker = 2, URL = "wwwroot/Images/2.png"},
+                    new Picture {PictureId = 3, EventPin = 3, Taker = 3, URL = "wwwroot/Images/3.png"}
+                );
         }
     }
 }

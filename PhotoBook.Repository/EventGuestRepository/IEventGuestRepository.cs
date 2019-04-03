@@ -13,8 +13,6 @@ namespace PhotoBook.Repository.EventGuestRepository
         Task<IQueryable<EventGuest>> GetEventGuestsByEventPin(int eventPin);
         Task<IQueryable<EventGuest>> GetEventGuestsByGuestId(int guestId);
         void InsertEventGuest(EventGuest guest);
-        void DeleteEventGuestByEventPin(int eventPin);
-        void DeleteEventGuestByGuestId(int guestId);
-        void UpdateEventGuest(EventGuest guest);
+        void DeleteEventGuest(EventGuest eventGuest);
     }
 }

@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using PhotoBook.Repository.EventRepository;
 using PhotoBook.Repository.HostRepository;
-using PhotoBook.Test;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
@@ -18,15 +17,23 @@ namespace Repository.Test
 {
     class EventRepositoryTest
     {
-        private InMemoryDatabaseHelper _inMemoryDatabaseHelper;
+        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
         private IEventRepository _uut;
+
+        public EventRepositoryTest()
+        {
+            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .Options;
+        }
 
         #region Sources
         private static Event[] EventSource =
         {
-            new Event{Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = 1, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
-            new Event{Location = "Lokation2", Description = "Beskrivelse2", Name = "Event2", HostId = 2, Pin = 2, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
-            new Event{Location = "Lokation3", Description = "Beskrivelse3", Name = "Event3", HostId = 3, Pin = 3, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event{Location = "Lokation4", Description = "Beskrivelse4", Name = "Event4", HostId = 1, Pin = 4, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event{Location = "Lokation5", Description = "Beskrivelse5", Name = "Event5", HostId = 2, Pin = 5, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event{Location = "Lokation6", Description = "Beskrivelse6", Name = "Event6", HostId = 3, Pin = 6, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
         };
 
         #endregion
@@ -36,38 +43,20 @@ namespace Repository.Test
         [SetUp]
         public void Setup()
         {
-            _inMemoryDatabaseHelper = new InMemoryDatabaseHelper("UnitTest");
-            _uut = new EventRepository(new PhotoBookDbContext(_inMemoryDatabaseHelper._options));
-
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureCreated();
-            }
+            _uut = new EventRepository(_InMemoryOptions);
         }
 
         [TearDown]
         public void TearDown()
-        {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                context.Database.EnsureDeleted();
-            }
-        }
+        { }
         #endregion
 
         #region Success Tests
-        [TestCase("Event1")]
-        [TestCase("Event2")]
-        [TestCase("Event3")]
+        [TestCase("Event4")]
+        [TestCase("Event5")]
+        [TestCase("Event6")]
         public void GetEvents_GettingListOfEventsAndFindingSpecific_ReturnsTrue(string name)
         {
-            using (var context = new PhotoBookDbContext(_inMemoryDatabaseHelper._options))
-            {
-                DataSeeder dataSeeder = new DataSeeder(context);
-                dataSeeder.SeedData();
-            }
-
-
             IQueryable<Event> events = _uut.GetEvents().Result;
 
             bool result = events.Any(e => e.Name == name);
@@ -82,7 +71,7 @@ namespace Repository.Test
 
             IQueryable<Event> events = _uut.GetEvents().Result;
 
-            bool result = events.Any(e => e == eve);
+            bool result = events.Any(e => e.Pin == eve.Pin);
 
             Assert.True(result);
         }
@@ -90,10 +79,12 @@ namespace Repository.Test
         [Test, TestCaseSource("EventSource")]
         public void GetEventByPin_AddFindCompare_ReturnsTrue(Event eve)
         {
-            _uut.InsertEvent(eve);
+            if (_uut.GetEvent(eve.Pin) != null)
+                _uut.InsertEvent(eve);
+
             var result = _uut.GetEvent(eve.Pin).Result;
 
-            Assert.AreEqual(eve, result);
+            Assert.AreEqual(eve.Pin, result.Pin);
         }
 
         [Test, TestCaseSource("EventSource")]
@@ -102,7 +93,7 @@ namespace Repository.Test
             _uut.InsertEvent(eve);
             var result = _uut.GetEvent(eve.Name).Result;
 
-            Assert.AreEqual(eve, result);
+            Assert.AreEqual(eve.Pin, result.Pin);
         }
 
         [Test, TestCaseSource("EventSource")]
@@ -114,7 +105,7 @@ namespace Repository.Test
 
             IQueryable<Event> result = _uut.GetEvents().Result;
 
-            Assert.AreEqual(null,result);
+            Assert.AreEqual(null, result);
         }
 
         [Test, TestCaseSource("EventSource")]
@@ -129,36 +120,18 @@ namespace Repository.Test
             Assert.AreEqual(null, result);
         }
 
-        [Test]
-        public void UpdateEvent_InsertChangeDescriptionCheck_EqualsNewDescription()
+        [Test, TestCaseSource("EventSource")]
+        public void UpdateEvent_InsertChangeDescriptionCheck_EqualsNewDescription(Event eve)
         {
-            var eveBefore = new Event
-            {
-                Location = "Lokation1",
-                Description = "Description1",
-                Name = "Event1",
-                HostId = 1,
-                Pin = 1,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.MaxValue
-            };
+            _uut.InsertEvent(eve);
 
-            var eveAfter = new Event
-            {
-                Location = "Lokation1",
-                Description = "NewDescription1",
-                Name = "Event1",
-                HostId = 1,
-                Pin = 1,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.MaxValue
-            };
+            var tempEve = _uut.GetEvent(eve.Pin).Result;
 
-            _uut.InsertEvent(eveBefore);
+            tempEve.Description = "NewDescription1";
 
-            _uut.UpdateEvent(eveAfter);
+            _uut.UpdateEvent(tempEve);
 
-            var result = _uut.GetEvent(eveBefore.Pin).Result;
+            var result = _uut.GetEvent(eve.Pin).Result;
 
             Assert.AreEqual("NewDescription1", result.Description);
         }

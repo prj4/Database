@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 [assembly: InternalsVisibleTo("PhotoBook.Test")]
-
+ 
 namespace PhotoBook.Repository.EventGuestRepository
 {
     public class EventGuestRepository : IEventGuestRepository

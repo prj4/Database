@@ -21,9 +21,8 @@ namespace PhotoBookDatabase.Migrations
 
             modelBuilder.Entity("PhotoBookDatabase.Model.Event", b =>
                 {
-                    b.Property<int>("Pin")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Pin")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description");
 
@@ -48,63 +47,63 @@ namespace PhotoBookDatabase.Migrations
                     b.HasData(
                         new
                         {
-                            Pin = 1,
+                            Pin = "1",
                             Description = "Beskrivelse1",
                             EndDate = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
                             HostId = 1,
                             Location = "Lokation1",
                             Name = "Event1",
-                            StartDate = new DateTime(2019, 4, 3, 19, 53, 35, 685, DateTimeKind.Local).AddTicks(9322)
+                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 14, DateTimeKind.Local).AddTicks(7073)
                         },
                         new
                         {
-                            Pin = 2,
+                            Pin = "2",
                             Description = "Beskrivelse2",
                             EndDate = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
                             HostId = 2,
                             Location = "Lokation2",
                             Name = "Event2",
-                            StartDate = new DateTime(2019, 4, 3, 19, 53, 35, 692, DateTimeKind.Local).AddTicks(4993)
+                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7396)
                         },
                         new
                         {
-                            Pin = 3,
+                            Pin = "3",
                             Description = "Beskrivelse3",
                             EndDate = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
                             HostId = 3,
                             Location = "Lokation3",
                             Name = "Event3",
-                            StartDate = new DateTime(2019, 4, 3, 19, 53, 35, 692, DateTimeKind.Local).AddTicks(5014)
-                        });
-                });
-
-            modelBuilder.Entity("PhotoBookDatabase.Model.EventGuest", b =>
-                {
-                    b.Property<int>("EventPin");
-
-                    b.Property<int>("GuestId");
-
-                    b.HasKey("EventPin", "GuestId");
-
-                    b.HasIndex("GuestId");
-
-                    b.ToTable("EventGuests");
-
-                    b.HasData(
-                        new
-                        {
-                            EventPin = 1,
-                            GuestId = 4
+                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7410)
                         },
                         new
                         {
-                            EventPin = 2,
-                            GuestId = 5
+                            Pin = "1234",
+                            Description = "Beskrivelse4",
+                            EndDate = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
+                            HostId = 1,
+                            Location = "Lokation4",
+                            Name = "Event4",
+                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7416)
                         },
                         new
                         {
-                            EventPin = 3,
-                            GuestId = 6
+                            Pin = "2345",
+                            Description = "Beskrivelse5",
+                            EndDate = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
+                            HostId = 2,
+                            Location = "Lokation5",
+                            Name = "Event5",
+                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7419)
+                        },
+                        new
+                        {
+                            Pin = "3456",
+                            Description = "Beskrivelse6",
+                            EndDate = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
+                            HostId = 3,
+                            Location = "Lokation6",
+                            Name = "Event6",
+                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7422)
                         });
                 });
 
@@ -114,7 +113,8 @@ namespace PhotoBookDatabase.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EventPin");
+                    b.Property<string>("EventPin")
+                        .IsRequired();
 
                     b.Property<int>("TakerId");
 
@@ -133,21 +133,21 @@ namespace PhotoBookDatabase.Migrations
                         new
                         {
                             PictureId = 1,
-                            EventPin = 1,
+                            EventPin = "1",
                             TakerId = 1,
                             URL = "wwwroot/Images/1.png"
                         },
                         new
                         {
                             PictureId = 2,
-                            EventPin = 2,
+                            EventPin = "2",
                             TakerId = 2,
                             URL = "wwwroot/Images/2.png"
                         },
                         new
                         {
                             PictureId = 3,
-                            EventPin = 3,
+                            EventPin = "3",
                             TakerId = 3,
                             URL = "wwwroot/Images/3.png"
                         });
@@ -176,23 +176,31 @@ namespace PhotoBookDatabase.Migrations
                 {
                     b.HasBaseType("PhotoBookDatabase.Model.PictureTaker");
 
+                    b.Property<string>("EventPin")
+                        .IsRequired();
+
+                    b.HasIndex("EventPin");
+
                     b.HasDiscriminator().HasValue("Guest");
 
                     b.HasData(
                         new
                         {
-                            PictureTakerId = 4,
-                            Name = "Guest1"
-                        },
-                        new
-                        {
                             PictureTakerId = 5,
-                            Name = "Guest2"
+                            Name = "Guest1",
+                            EventPin = "1"
                         },
                         new
                         {
                             PictureTakerId = 6,
-                            Name = "Guest3"
+                            Name = "Guest2",
+                            EventPin = "2"
+                        },
+                        new
+                        {
+                            PictureTakerId = 7,
+                            Name = "Guest3",
+                            EventPin = "3"
                         });
                 });
 
@@ -227,6 +235,12 @@ namespace PhotoBookDatabase.Migrations
                             PictureTakerId = 3,
                             Name = "Host3",
                             Email = "Email3@email.com"
+                        },
+                        new
+                        {
+                            PictureTakerId = 4,
+                            Name = "Host5",
+                            Email = "Email5@email.com"
                         });
                 });
 
@@ -235,33 +249,25 @@ namespace PhotoBookDatabase.Migrations
                     b.HasOne("PhotoBookDatabase.Model.Host", "Host")
                         .WithMany("Events")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("PhotoBookDatabase.Model.EventGuest", b =>
-                {
-                    b.HasOne("PhotoBookDatabase.Model.Event", "Event")
-                        .WithMany("EventGuests")
-                        .HasForeignKey("EventPin")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PhotoBookDatabase.Model.Guest", "Guest")
-                        .WithMany("EventGuests")
-                        .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("PhotoBookDatabase.Model.Picture", b =>
                 {
                     b.HasOne("PhotoBookDatabase.Model.Event", "Event")
                         .WithMany("Pictures")
-                        .HasForeignKey("EventPin")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("EventPin");
 
                     b.HasOne("PhotoBookDatabase.Model.PictureTaker", "PictureTaker")
                         .WithMany("Pictures")
-                        .HasForeignKey("TakerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("TakerId");
+                });
+
+            modelBuilder.Entity("PhotoBookDatabase.Model.Guest", b =>
+                {
+                    b.HasOne("PhotoBookDatabase.Model.Event", "Event")
+                        .WithMany("Guests")
+                        .HasForeignKey("EventPin");
                 });
 #pragma warning restore 612, 618
         }

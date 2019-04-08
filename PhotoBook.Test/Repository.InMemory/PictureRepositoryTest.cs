@@ -29,9 +29,9 @@ namespace PhotoBook.Test.Repository.InMemory
 
         private static Picture[] PictureSource =
         {
-            new Picture {PictureId = 1, EventPin = 1, TakerId = 1, URL = "wwwroot/Images/1.png"},
-            new Picture {PictureId = 2, EventPin = 2, TakerId = 2, URL = "wwwroot/Images/2.png"},
-            new Picture {PictureId = 3, EventPin = 3, TakerId = 3, URL = "wwwroot/Images/3.png"}
+            new Picture {PictureId = 1, EventPin = "1", TakerId = 1, URL = "wwwroot/Images/1.png"},
+            new Picture {PictureId = 2, EventPin = "2", TakerId = 2, URL = "wwwroot/Images/2.png"},
+            new Picture {PictureId = 3, EventPin = "3", TakerId = 3, URL = "wwwroot/Images/3.png"}
         };
 
         #endregion
@@ -114,9 +114,9 @@ namespace PhotoBook.Test.Repository.InMemory
         public void UpdatePicture_InsertChangeUrlCheck_EqualsNewUrl()
         {
 
-            var PictureBefore = new Picture {PictureId = 1, EventPin = 1, TakerId = 1, URL = "wwwroot/Images/1.png"};
+            var PictureBefore = new Picture {PictureId = 1, EventPin = "1", TakerId = 1, URL = "wwwroot/Images/1.png"};
 
-            var PictureAfter = new Picture {PictureId = 1, EventPin = 1, TakerId = 1, URL = "wwwroot/Images/New1.png"};
+            var PictureAfter = new Picture {PictureId = 1, EventPin = "1", TakerId = 1, URL = "wwwroot/Images/New1.png"};
 
             _uut.InsertPicture(PictureBefore);
 

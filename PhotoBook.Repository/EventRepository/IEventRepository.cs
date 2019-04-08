@@ -10,11 +10,10 @@ namespace PhotoBook.Repository.EventRepository
     public interface IEventRepository
     {
         Task<IQueryable<Event>> GetEvents();
-        Task<Event> GetEvent(int pin);
-        Task<Event> GetEvent(string name);
+        Task<Event> GetEvent(string pin);
+        Task<IQueryable<Event>> GetEvents(int hostId);
         void InsertEvent(Event eve);
-        void DeleteEvent(int pin);
-        void DeleteEvent(string name);
+        void DeleteEvent(string pin);
         void UpdateEvent(Event eve);
     }
 }

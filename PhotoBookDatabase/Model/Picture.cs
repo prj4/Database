@@ -13,9 +13,10 @@ namespace PhotoBookDatabase.Model
         [Url]
         public string URL { get; set; }
         [Required]
-        public int EventPin { get; set; }
+        public string EventPin { get; set; }
         public Event Event { get; set; }
         [Required]
+        
         public int TakerId { get; set; }
         public PictureTaker PictureTaker { get; set; }
     }

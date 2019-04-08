@@ -47,7 +47,6 @@ namespace PhotoBook.Test.Repository.InMemory
         #endregion
 
         #region Success Tests
-        [TestCase("Host1")]
         [TestCase("Host2")]
         [TestCase("Host3")]
         public void GetHosts_GettingListOfHostsAndFindingSpecific_ReturnsTrue(string name)

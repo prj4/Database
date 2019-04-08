@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EventGuestRepository\**" />
+    <EmbeddedResource Remove="EventGuestRepository\**" />
+    <None Remove="EventGuestRepository\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PhotoBookDatabase\PhotoBookDatabase.csproj" />
   </ItemGroup>
 

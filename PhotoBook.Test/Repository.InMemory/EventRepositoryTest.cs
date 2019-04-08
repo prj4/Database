@@ -25,9 +25,9 @@ namespace PhotoBook.Test.Repository.InMemory
         #region Sources
         private static Event[] EventSource =
         {
-            new Event{Location = "Lokation4", Description = "Beskrivelse4", Name = "Event4", HostId = 1, Pin = 4, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
-            new Event{Location = "Lokation5", Description = "Beskrivelse5", Name = "Event5", HostId = 2, Pin = 5, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
-            new Event{Location = "Lokation6", Description = "Beskrivelse6", Name = "Event6", HostId = 3, Pin = 6, StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event{Location = "Lokation4", Description = "Beskrivelse4", Name = "Event4", HostId = 1, Pin = "9876", StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event{Location = "Lokation5", Description = "Beskrivelse5", Name = "Event5", HostId = 2, Pin = "7865", StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event{Location = "Lokation6", Description = "Beskrivelse6", Name = "Event6", HostId = 3, Pin = "5634", StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
         };
 
         #endregion
@@ -46,14 +46,14 @@ namespace PhotoBook.Test.Repository.InMemory
         #endregion
 
         #region Success Tests
-        [TestCase("Event4")]
-        [TestCase("Event5")]
-        [TestCase("Event6")]
-        public void GetEvents_GettingListOfEventsAndFindingSpecific_ReturnsTrue(string name)
+        [Test, TestCaseSource("EventSource")]
+        public void GetEvents_GettingListOfEventsAndFindingSpecific_ReturnsTrue(Event eve)
         {
+            _uut.InsertEvent(eve);
+
             IQueryable<Event> events = _uut.GetEvents().Result;
 
-            bool result = events.Any(e => e.Name == name);
+            bool result = events.Any(e => e.Name == eve.Name);
 
             Assert.True(result);
         }
@@ -81,15 +81,7 @@ namespace PhotoBook.Test.Repository.InMemory
             Assert.AreEqual(eve.Pin, result.Pin);
         }
 
-        [Test, TestCaseSource("EventSource")]
-        public void GetEventByName_AddFindCompare_ReturnsTrue(Event eve)
-        {
-            _uut.InsertEvent(eve);
-            var result = _uut.GetEvent(eve.Name).Result;
-
-            Assert.AreEqual(eve.Pin, result.Pin);
-        }
-
+        
         [Test, TestCaseSource("EventSource")]
         public void DeleteEventByPin_InserteDeleteCheckIfNothing_EqualsNull(Event eve)
         {
@@ -102,17 +94,6 @@ namespace PhotoBook.Test.Repository.InMemory
             Assert.AreEqual(null, result);
         }
 
-        [Test, TestCaseSource("EventSource")]
-        public void DeleteEventByName_InserteDeleteCheckIfNothing_EqualsNull(Event eve)
-        {
-            _uut.InsertEvent(eve);
-
-            _uut.DeleteEvent(eve.Name);
-
-            IQueryable<Event> result = _uut.GetEvents().Result;
-
-            Assert.AreEqual(null, result);
-        }
 
         [Test, TestCaseSource("EventSource")]
         public void UpdateEvent_InsertChangeDescriptionCheck_EqualsNewDescription(Event eve)
@@ -137,7 +118,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void GetEventById_TryingToGetNonExistingEvent_ReturnsNull()
         {
-            var result = _uut.GetEvent(1).Result;
+            var result = _uut.GetEvent("1").Result;
 
             Assert.AreEqual(null, result);
         }
@@ -149,6 +130,32 @@ namespace PhotoBook.Test.Repository.InMemory
 
             Assert.AreEqual(null, result);
         }
+
+        public void GetEvent_GettingEventsAttachedToHost_ReturnsTrue()
+        {
+            var Event1 = new Event
+            {
+                Location = "Lokation", Description = "Beskrivelse", Name = "Event", HostId = 5, Pin = "4351",
+                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
+            };
+            var Event2 = new Event
+            {
+                Location = "Lokation", Description = "Beskrivelse", Name = "Event", HostId = 5, Pin = "3451",
+                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
+            };
+            _uut.InsertEvent(Event1);
+            _uut.InsertEvent(Event2);
+
+            var events = _uut.GetEvents(Event1.HostId).Result;
+
+
+
+            var result = events.Count(e => e.HostId == Event1.HostId);
+
+            Assert.AreEqual(null, result);
+        }
+
+
         #endregion
 
     }

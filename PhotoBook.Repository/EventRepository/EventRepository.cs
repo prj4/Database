@@ -48,7 +48,7 @@ namespace PhotoBook.Repository.EventRepository
                 return result;
             }
         }
-        private async Task<bool> Exists(int pin)
+        private async Task<bool> Exists(string pin)
         {
             using (var context = new PhotoBookDbContext(_options))
             {
@@ -58,17 +58,17 @@ namespace PhotoBook.Repository.EventRepository
                 return false;
             }
         }
-        private async Task<bool> Exists(string name)
+
+        private async Task<bool> Exists(int HostId)
         {
             using (var context = new PhotoBookDbContext(_options))
             {
                 if (await context.Events
-                    .AnyAsync(e => e.Name == name))
+                    .AnyAsync(e => e.HostId == HostId))
                     return true;
                 return false;
             }
         }
-        
 
         #endregion
 
@@ -88,7 +88,20 @@ namespace PhotoBook.Repository.EventRepository
             return null;
         }
 
-        public async Task<Event> GetEvent(int eventPin)
+        public async Task<IQueryable<Event>> GetEvents(int hostId)
+        {
+            if (Exists(hostId).Result)
+            {
+                using (var context = new PhotoBookDbContext(_options))
+                {
+                    var events = await context.Events.Where(e => e.HostId == hostId).ToListAsync();
+                    return events.AsQueryable();
+                }
+            }
+            return null;
+        }
+
+        public async Task<Event> GetEvent(string eventPin)
         {
             if (Exists(eventPin).Result)
             {
@@ -103,22 +116,6 @@ namespace PhotoBook.Repository.EventRepository
             return null;
         }
 
-        public async Task<Event> GetEvent(string name)
-        {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (Exists(name).Result)
-                {
-                    var eve = await context.Events
-                        .Where(x => x.Name == name)
-                        .FirstOrDefaultAsync();
-                    return eve;
-                }
-
-                return null;
-            }
-        }
-
         public async void InsertEvent(Event eve)
         {
             if (!Exists(eve).Result)
@@ -131,7 +128,7 @@ namespace PhotoBook.Repository.EventRepository
             }
         }
 
-        public async void DeleteEvent(int pin)
+        public async void DeleteEvent(string pin)
         {
             if (Exists(pin).Result)
             {
@@ -139,23 +136,6 @@ namespace PhotoBook.Repository.EventRepository
                 {
                     var eve = context.Events
                         .FindAsync(pin).Result;
-
-                    context.Events.Remove(eve);
-                    await context.SaveChangesAsync();
-                }
-            }
-        }
-
-        public async void DeleteEvent(string name)
-        {
-            if (Exists(name).Result)
-            {
-                using (var context = new PhotoBookDbContext(_options))
-                {
-
-                    var eve = context.Events
-                        .Where(x => x.Name == name)
-                        .FirstOrDefaultAsync().Result;
 
                     context.Events.Remove(eve);
                     await context.SaveChangesAsync();

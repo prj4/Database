@@ -8,8 +8,9 @@ namespace PhotoBookDatabase.Model
 {
     public class Guest : PictureTaker
     {
-        
-        public IList<EventGuest> EventGuests { get; set; }
+        [Required]
+        public string EventPin { get; set; }
+        public Event Event { get; set; }
         
     }
 }

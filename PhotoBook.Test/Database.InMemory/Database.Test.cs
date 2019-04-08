@@ -65,10 +65,10 @@ namespace PhotoBook.Test.Database.InMemory
         }
 
 
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        public void CreationOfEvent_SearchingOnPin_ReturnsTrue(int pin)
+        [TestCase("1")]
+        [TestCase("2")]
+        [TestCase("3")]
+        public void CreationOfEvent_SearchingOnPin_ReturnsTrue(string pin)
         {
             var result = _context.Events
                 .Where(e => e.Pin == pin)
@@ -90,18 +90,7 @@ namespace PhotoBook.Test.Database.InMemory
             
         }
 
-        [TestCase(1,4)]
-        [TestCase(2,5)]
-        [TestCase(3,6)]
-        public void CreationOfEventGuest_SearchingOnEventPin_ReturnsTrueOnGuestId(int eventPin, int guestId)
-        {
-            var result = _context.EventGuests
-                .Where(eg => eg.EventPin == eventPin)
-                .FirstOrDefault().GuestId;
-
-            Assert.AreEqual(guestId, result);
-
-        }
+        
 
 
 

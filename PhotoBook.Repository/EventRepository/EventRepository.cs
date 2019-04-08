@@ -43,7 +43,7 @@ namespace PhotoBook.Repository.EventRepository
         {
             using (var context = new PhotoBookDbContext(_options))
             {
-                bool result = await context.Events.AnyAsync(e => (e.HostId == eve.HostId) && e.Pin == eve.Pin);
+                bool result = await context.Events.AnyAsync(e => (e.HostId == eve.HostId) && (e.Pin == eve.Pin));
 
                 return result;
             }

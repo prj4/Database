@@ -71,7 +71,7 @@ namespace PhotoBook.Repository.EventRepository
                 if (IfAny(context).Result)
                 {
                     var events = await context.Events.ToListAsync();
-                    return events.AsQueryable();
+                    return events.AsEnumerable();
                 }
             }
             return null;
@@ -84,7 +84,7 @@ namespace PhotoBook.Repository.EventRepository
                 if (ExistsByHostId(hostId, context).Result)
                 {
                     var events = await context.Events.Where(e => e.HostId == hostId).ToListAsync();
-                    return events.AsQueryable();
+                    return events.AsEnumerable();
                 }
             }
             return null;

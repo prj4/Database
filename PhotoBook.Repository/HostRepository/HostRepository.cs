@@ -76,7 +76,7 @@ using PhotoBookDatabase.Model;
                 {
                     var hosts = await context.Hosts.ToListAsync();
 
-                    return hosts.AsQueryable();
+                    return hosts.AsEnumerable();
                 }
             }
             return null;

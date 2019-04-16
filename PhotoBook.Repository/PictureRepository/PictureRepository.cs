@@ -64,7 +64,7 @@ namespace PhotoBook.Repository.PictureRepository
                 {
                     var Pictures = await context.Pictures.ToListAsync();
 
-                    return Pictures.AsQueryable();
+                    return Pictures.AsEnumerable();
                 }
             }
             return null;

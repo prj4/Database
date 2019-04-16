@@ -77,7 +77,7 @@ namespace PhotoBook.Repository.GuestRepository
                 if (IfAny(context).Result)
                 { 
                     var guests = await context.Guests.ToListAsync();
-                    return guests;
+                    return guests.AsEnumerable();
                 }
             }
             return null;

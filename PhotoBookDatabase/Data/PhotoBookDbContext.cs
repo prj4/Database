@@ -28,19 +28,15 @@ namespace PhotoBookDatabase.Data
             {
                 optionsBuilder.UseSqlServer("Server=tcp:katrinesphotobook.database.windows.net,1433;Initial Catalog=PhotoBook5;Persist Security Info=False;User ID=Ingeniørhøjskolen@katrinesphotobook.database.windows.net;Password=Katrinebjergvej22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
                 
-            }
-
-            
+            }   
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             HostOnModelCreating(modelBuilder);
             EventOnModelCreating(modelBuilder);
             GuestOnModelCreating(modelBuilder);
             PictureOnModelCreating(modelBuilder);
-
         }
 
         void GuestOnModelCreating(ModelBuilder modelBuilder)
@@ -141,9 +137,9 @@ namespace PhotoBookDatabase.Data
 
             modelBuilder.Entity<Picture>()
                 .HasData(
-                    new Picture {PictureId = 1, EventPin = "1", TakerId = 1, URL = "wwwroot/Images/1.png"},
-                    new Picture {PictureId = 2, EventPin = "2", TakerId = 2, URL = "wwwroot/Images/2.png"},
-                    new Picture {PictureId = 3, EventPin = "3", TakerId = 3, URL = "wwwroot/Images/3.png"}
+                    new Picture {PictureId = 1, EventPin = "1", TakerId = 1},
+                    new Picture {PictureId = 2, EventPin = "2", TakerId = 2},
+                    new Picture {PictureId = 3, EventPin = "3", TakerId = 3}
                 );
         }
     }

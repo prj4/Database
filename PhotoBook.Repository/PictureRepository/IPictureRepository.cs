@@ -10,11 +10,10 @@ namespace PhotoBook.Repository.PictureRepository
 {
     public interface IPictureRepository
     {
-        Task<IQueryable<Picture>> GetPictures();
-        Task<Picture> GetPicture(int pictureId);
-        void InsertPicture(Picture picture);
-        void DeletePicture(int pictureId);
-        void DeletePicture(string url);
-        void UpdatePicture(Picture picture);
+        Task<IEnumerable<Picture>> GetPictures();
+        Task<Picture> GetPictureById(int pictureId);
+        Task<int> InsertPicture(Picture picture);
+        Task DeletePictureById(int pictureId);
+        
     }
 }

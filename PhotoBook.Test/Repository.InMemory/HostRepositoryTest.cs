@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -51,7 +52,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [TestCase("Host3")]
         public void GetHosts_GettingListOfHostsAndFindingSpecific_ReturnsTrue(string name)
         {
-            IQueryable<Host> hosts = _uut.GetHosts().Result;
+            IEnumerable<Host> hosts = _uut.GetHosts().Result;
 
             bool result = hosts.Any(h => h.Name == name);
 
@@ -65,7 +66,7 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertHost(host);
 
-            IQueryable<Host> hosts = _uut.GetHosts().Result;
+            IEnumerable<Host> hosts = _uut.GetHosts().Result;
 
             bool result = hosts.Any(h => h.PictureTakerId == host.PictureTakerId);
 
@@ -76,16 +77,16 @@ namespace PhotoBook.Test.Repository.InMemory
         public void GetHostById_AddFindCompare_ReturnsTrue(Host host)
         {
             _uut.InsertHost(host);
-            var tempHost = _uut.GetHost(host.PictureTakerId).Result;
+            var tempHost = _uut.GetHostById(host.PictureTakerId).Result;
 
             Assert.AreEqual(host.PictureTakerId,tempHost.PictureTakerId);
         }
 
         [Test, TestCaseSource("HostSource")]
-        public void GetHostByName_AddFindCompare_ReturnsTrue(Host host)
+        public void GetHostByEmail_AddFindCompare_ReturnsTrue(Host host)
         {
             _uut.InsertHost(host);
-            var tempHost = _uut.GetHost(host.Name).Result;
+            var tempHost = _uut.GetHostByEmail(host.Email).Result;
 
             Assert.AreEqual(host.PictureTakerId, tempHost.PictureTakerId);
         }
@@ -95,21 +96,21 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertHost(host);
 
-            _uut.DeleteHost(host.PictureTakerId);
+            _uut.DeleteHostById(host.PictureTakerId);
 
-            IQueryable<Host> result = _uut.GetHosts().Result;
+            IEnumerable<Host> result = _uut.GetHosts().Result;
 
             Assert.AreEqual(null,result);
         }
 
         [Test, TestCaseSource("HostSource")]
-        public void DeleteHostByName_InsertDeleteCheckifNothing_EqualsNull(Host host)
+        public void DeleteHostByEmail_InsertDeleteCheckifNothing_EqualsNull(Host host)
         {
             _uut.InsertHost(host);
 
-            _uut.DeleteHost(host.Name);
+            _uut.DeleteHostByEmail(host.Email);
 
-            IQueryable<Host> result = _uut.GetHosts().Result;
+            IEnumerable<Host> result = _uut.GetHosts().Result;
 
             Assert.AreEqual(null, result);
         }
@@ -135,7 +136,7 @@ namespace PhotoBook.Test.Repository.InMemory
 
             _uut.UpdateHost(hostAfter);
 
-            var result = _uut.GetHost(hostAfter.PictureTakerId).Result;
+            var result = _uut.GetHostById(hostAfter.PictureTakerId).Result;
 
             Assert.AreEqual("NewEmail1@email.com", result.Email);
         }
@@ -145,15 +146,15 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void GetHostById_TryingToGetNonExistingHost_ReturnsNull()
         {
-            var result = _uut.GetHost(200).Result;
+            var result = _uut.GetHostById(200).Result;
 
             Assert.AreEqual(null,result);
         }
 
         [Test]
-        public void GetHostByName_TryingToGetNonExistingHost_ReturnsNull()
+        public void GetHostByEmail_TryingToGetNonExistingHost_ReturnsNull()
         {
-            var result = _uut.GetHost("Test").Result;
+            var result = _uut.GetHostByEmail("Test").Result;
 
             Assert.AreEqual(null, result);
         }

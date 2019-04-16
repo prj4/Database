@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -25,9 +26,9 @@ namespace PhotoBook.Test.Repository.InMemory
         #region Sources
         private static Guest[] GuestSource =
         {
-            new Guest{Name = "Guest1"},
-            new Guest{Name = "Guest2"},
-            new Guest{Name = "Guest3"}
+            new Guest{Name = "Guest1",EventPin = "1"},
+            new Guest{Name = "Guest2", EventPin = "1"},
+            new Guest{Name = "Guest3", EventPin = "1"}
         };
 
         #endregion
@@ -52,7 +53,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [TestCase("Guest3")]
         public void GetGuests_GettingListOfGuestsAndFindingSpecific_ReturnsTrue(string name)
         {
-            IQueryable<Guest> guests = _uut.GetGuests().Result;
+            IEnumerable<Guest> guests = _uut.GetGuests().Result;
 
             bool result = guests.Any(e => e.Name == name);
 
@@ -64,7 +65,7 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertGuest(guest);
 
-            IQueryable<Guest> guests = _uut.GetGuests().Result;
+            IEnumerable<Guest> guests = _uut.GetGuests().Result;
 
             bool result = guests.Any(g => g.PictureTakerId == guest.PictureTakerId);
 
@@ -75,16 +76,16 @@ namespace PhotoBook.Test.Repository.InMemory
         public void GetGuestById_AddFindCompare_ReturnsTrue(Guest guest)
         {
             _uut.InsertGuest(guest);
-            var result = _uut.GetGuest(guest.PictureTakerId).Result;
+            var result = _uut.GetGuestById(guest.PictureTakerId).Result;
 
             Assert.AreEqual(guest.PictureTakerId, result.PictureTakerId);
         }
 
         [Test, TestCaseSource("GuestSource")]
-        public void GetGuestByName_AddFindCompare_ReturnsTrue(Guest guest)
+        public void GetGuestByNameAndEventPin_AddFindCompare_ReturnsTrue(Guest guest)
         {
             _uut.InsertGuest(guest);
-            var result = _uut.GetGuest(guest.Name).Result;
+            var result = _uut.GetGuestByNameAndEventPin(guest.Name, "1").Result;
 
             Assert.AreEqual(guest.PictureTakerId, result.PictureTakerId);
         }
@@ -94,9 +95,9 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertGuest(guest);
 
-            _uut.DeleteGuest(guest.PictureTakerId);
+            _uut.DeleteGuestById(guest.PictureTakerId);
 
-            IQueryable<Guest> result = _uut.GetGuests().Result;
+            IEnumerable<Guest> result = _uut.GetGuests().Result;
 
             Assert.AreEqual(null, result);
         }
@@ -106,9 +107,9 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertGuest(guest);
 
-            _uut.DeleteGuest(guest.Name);
+            _uut.DeleteGuestByNameAndEventPin(guest.Name, "1");
 
-            IQueryable<Guest> result = _uut.GetGuests().Result;
+            IEnumerable<Guest> result = _uut.GetGuests().Result;
 
             Assert.AreEqual(null, result);
         }
@@ -124,7 +125,7 @@ namespace PhotoBook.Test.Repository.InMemory
 
             _uut.UpdateGuest(GuestAfter);
 
-            var result = _uut.GetGuest(1).Result;
+            var result = _uut.GetGuestById(1).Result;
 
             Assert.AreEqual("NewGuest1", result.Name);
         }
@@ -136,15 +137,15 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void GetGuestById_TryingToGetNonExistingGuest_ReturnsNull()
         {
-            var result = _uut.GetGuest(99).Result;
+            var result = _uut.GetGuestById(99).Result;
 
             Assert.AreEqual(null, result);
         }
 
         [Test]
-        public void GetGuestByName_TryingToGetNonExistingGuest_ReturnsNull()
+        public void GetGuestByNameAndEventPin_TryingToGetNonExistingGuest_ReturnsNull()
         {
-            var result = _uut.GetGuest("Test").Result;
+            var result = _uut.GetGuestByNameAndEventPin("Test","100").Result;
 
             Assert.AreEqual(null, result);
         }

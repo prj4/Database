@@ -53,7 +53,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation1",
                             Name = "Event1",
-                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 14, DateTimeKind.Local).AddTicks(7073)
+                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 826, DateTimeKind.Local).AddTicks(218)
                         },
                         new
                         {
@@ -63,7 +63,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation2",
                             Name = "Event2",
-                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7396)
+                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9861)
                         },
                         new
                         {
@@ -73,7 +73,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation3",
                             Name = "Event3",
-                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7410)
+                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9878)
                         },
                         new
                         {
@@ -83,7 +83,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation4",
                             Name = "Event4",
-                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7416)
+                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9884)
                         },
                         new
                         {
@@ -93,7 +93,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation5",
                             Name = "Event5",
-                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7419)
+                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9887)
                         },
                         new
                         {
@@ -103,7 +103,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation6",
                             Name = "Event6",
-                            StartDate = new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7422)
+                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9893)
                         });
                 });
 
@@ -118,9 +118,6 @@ namespace PhotoBookDatabase.Migrations
 
                     b.Property<int>("TakerId");
 
-                    b.Property<string>("URL")
-                        .IsRequired();
-
                     b.HasKey("PictureId");
 
                     b.HasIndex("EventPin");
@@ -134,22 +131,19 @@ namespace PhotoBookDatabase.Migrations
                         {
                             PictureId = 1,
                             EventPin = "1",
-                            TakerId = 1,
-                            URL = "wwwroot/Images/1.png"
+                            TakerId = 1
                         },
                         new
                         {
                             PictureId = 2,
                             EventPin = "2",
-                            TakerId = 2,
-                            URL = "wwwroot/Images/2.png"
+                            TakerId = 2
                         },
                         new
                         {
                             PictureId = 3,
                             EventPin = "3",
-                            TakerId = 3,
-                            URL = "wwwroot/Images/3.png"
+                            TakerId = 3
                         });
                 });
 

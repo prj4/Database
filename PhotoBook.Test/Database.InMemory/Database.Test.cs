@@ -77,18 +77,7 @@ namespace PhotoBook.Test.Database.InMemory
             Assert.AreEqual(pin, result);
         }
 
-        [TestCase("wwwroot/Images/1.png")]
-        [TestCase("wwwroot/Images/2.png")]
-        [TestCase("wwwroot/Images/3.png")]
-        public void CreationOfPicture_SearchingOnPUrl_ReturnsTrue(string url)
-        {
-                var result = _context.Pictures
-                    .Where(p => p.URL == url)
-                    .FirstOrDefault().URL;
-
-                Assert.AreEqual(url, result);
-            
-        }
+        
 
         
 
@@ -139,18 +128,7 @@ namespace PhotoBook.Test.Database.InMemory
             Assert.AreEqual(descriptionAfter, result);
         }
 
-        [TestCase("wwwroot/Images/1.png", "New/URL1")]
-        [TestCase("wwwroot/Images/2.png", "New/URL2")]
-        [TestCase("wwwroot/Images/3.png", "New/URL3")]
-        public void UpdateOfPicture_SearchingOnPUrlAndChanging_ReturnsTrue(string urlBefore, string urlAfter)
-        {
-            var result = _context.Pictures
-                .Where(p => p.URL == urlBefore)
-                .FirstOrDefault().URL = urlAfter;
-
-            Assert.AreEqual(urlAfter, result);
-        }
-#endregion
+        #endregion
 
         #region Deletion/Read Tests
         
@@ -190,22 +168,6 @@ namespace PhotoBook.Test.Database.InMemory
             bool result = _context.Events.Any(h => h.Name == name);
             Assert.False(result);
         }
-
-        [TestCase("wwwroot/Images/1.png")]
-        [TestCase("wwwroot/Images/2.png")]
-        [TestCase("wwwroot/Images/3.png")]
-        public void DeletionOPicture_SearchingOnURLDeletingAndFinding_returnsFalse(string url)
-        {
-                var picture = _context.Pictures.FirstOrDefault(p => p.URL == url);
-                _context.Pictures.Remove(picture);
-                _context.SaveChanges();
-
-                bool result = _context.Pictures.Any(p => p.URL == url);
-                Assert.False(result);
-            
-        }
-
-
 
         #endregion
 

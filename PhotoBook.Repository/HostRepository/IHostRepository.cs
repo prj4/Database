@@ -10,12 +10,12 @@ namespace PhotoBook.Repository.HostRepository
 {
     public interface IHostRepository
     {
-        Task<IQueryable<Host>> GetHosts();
-        Task<Host> GetHost(int hostId);
-        Task<Host> GetHost(string hostName);
-        void InsertHost(Host host);
-        void DeleteHost(int hostId);
-        void DeleteHost(string hostName);
-        void UpdateHost(Host host);
+        Task<IEnumerable<Host>> GetHosts();
+        Task<Host> GetHostById(int hostId);
+        Task<Host> GetHostByEmail(string email);
+        Task InsertHost(Host host);
+        Task DeleteHostById(int hostId);
+        Task DeleteHostByEmail(string email);
+        Task UpdateHost(Host host);
     }
 }

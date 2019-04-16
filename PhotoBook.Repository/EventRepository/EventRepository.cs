@@ -31,56 +31,45 @@ namespace PhotoBook.Repository.EventRepository
 
         #region Private Methods
 
-        private async Task<bool> IfAny()
+        private async Task<bool> IfAny(PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                bool result = await context.Events.AnyAsync();
-                return result;
-            }
-        }
-        private async Task<bool> Exists(Event eve)
-        {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                bool result = await context.Events.AnyAsync(e => (e.HostId == eve.HostId) && (e.Pin == eve.Pin));
-
-                return result;
-            }
-        }
-        private async Task<bool> Exists(string pin)
-        {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (await context.Events
-                    .AnyAsync(e => e.Pin == pin))
-                    return true;
-                return false;
-            }
+            bool result = await context.Events.AnyAsync();
+            return result;
         }
 
-        private async Task<bool> Exists(int HostId)
+
+        private async Task<bool> ExistsByEvent(Event eve, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (await context.Events
-                    .AnyAsync(e => e.HostId == HostId))
-                    return true;
-                return false;
-            }
+            bool result = await context.Events.AnyAsync(e => (e.HostId == eve.HostId) && (e.Pin == eve.Pin));
+            return result;
+        }
+
+        private async Task<bool> ExistsByPin(string pin, PhotoBookDbContext context)
+        {
+            if (await context.Events
+                .AnyAsync(e => e.Pin == pin))
+                return true;
+            return false;
+        }
+
+        private async Task<bool> ExistsByHostId(int HostId, PhotoBookDbContext context)
+        {
+            if (await context.Events
+                .AnyAsync(e => e.HostId == HostId))
+                return true;
+            return false;
         }
 
         #endregion
 
         #region IEventRepository Implementation
 
-        public async Task<IQueryable<Event>> GetEvents()
+        public async Task<IEnumerable<Event>> GetEvents()
         {
-            if (IfAny().Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (IfAny(context).Result)
                 {
-
                     var events = await context.Events.ToListAsync();
                     return events.AsQueryable();
                 }
@@ -88,11 +77,11 @@ namespace PhotoBook.Repository.EventRepository
             return null;
         }
 
-        public async Task<IQueryable<Event>> GetEvents(int hostId)
+        public async Task<IEnumerable<Event>> GetEventsByHostId(int hostId)
         {
-            if (Exists(hostId).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByHostId(hostId, context).Result)
                 {
                     var events = await context.Events.Where(e => e.HostId == hostId).ToListAsync();
                     return events.AsQueryable();
@@ -101,13 +90,12 @@ namespace PhotoBook.Repository.EventRepository
             return null;
         }
 
-        public async Task<Event> GetEvent(string eventPin)
+        public async Task<Event> GetEventByPin(string eventPin)
         {
-            if (Exists(eventPin).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByPin(eventPin, context).Result)
                 {
-
                     var eve = await context.Events
                         .FindAsync(eventPin);
                     return eve;
@@ -116,11 +104,11 @@ namespace PhotoBook.Repository.EventRepository
             return null;
         }
 
-        public async void InsertEvent(Event eve)
+        public async Task InsertEvent(Event eve)
         {
-            if (!Exists(eve).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (!ExistsByEvent(eve, context).Result)
                 {
                     await context.Events.AddAsync(eve);
                     await context.SaveChangesAsync();
@@ -128,11 +116,11 @@ namespace PhotoBook.Repository.EventRepository
             }
         }
 
-        public async void DeleteEvent(string pin)
+        public async Task DeleteEventByPin(string pin)
         {
-            if (Exists(pin).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByPin(pin, context).Result)
                 {
                     var eve = context.Events
                         .FindAsync(pin).Result;
@@ -143,13 +131,12 @@ namespace PhotoBook.Repository.EventRepository
             }
         }
 
-        public async void UpdateEvent(Event eve)
+        public async Task UpdateEvent(Event eve)
         {
-            if (Exists(eve).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByEvent(eve, context).Result)
                 {
-
                     var entity = await context.Events.FindAsync(eve.Pin);
 
                     entity.Description = eve.Description;
@@ -160,7 +147,6 @@ namespace PhotoBook.Repository.EventRepository
                     entity.Location = eve.Location;
 
                     context.Update(entity);
-
 
                     await context.SaveChangesAsync();
                 }

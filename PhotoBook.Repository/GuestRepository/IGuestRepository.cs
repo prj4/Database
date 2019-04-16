@@ -10,12 +10,12 @@ namespace PhotoBook.Repository.GuestRepository
 {
     public interface IGuestRepository
     {
-        Task<IQueryable<Guest>> GetGuests();
-        Task<Guest> GetGuest(int guestId);
-        Task<Guest> GetGuest(string name);
-        void InsertGuest(Guest guest);
-        void DeleteGuest(int id);
-        void DeleteGuest(string name);
-        void UpdateGuest(Guest guest);
+        Task<IEnumerable<Guest>> GetGuests();
+        Task<Guest> GetGuestById(int guestId);
+        Task<Guest> GetGuestByNameAndEventPin(string name, string eventPin);
+        Task InsertGuest(Guest guest);
+        Task DeleteGuestById(int id);
+        Task DeleteGuestByNameAndEventPin(string name, string eventPin);
+        Task UpdateGuest(Guest guest);
     }
 }

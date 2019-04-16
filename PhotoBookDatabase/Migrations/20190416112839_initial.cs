@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PhotoBookDatabase.Migrations
 {
-    public partial class Base : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +14,6 @@ namespace PhotoBookDatabase.Migrations
                 {
                     PictureId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    URL = table.Column<string>(nullable: false),
                     EventPin = table.Column<string>(nullable: false),
                     TakerId = table.Column<int>(nullable: false)
                 },
@@ -78,12 +77,12 @@ namespace PhotoBookDatabase.Migrations
                 columns: new[] { "Pin", "Description", "EndDate", "HostId", "Location", "Name", "StartDate" },
                 values: new object[,]
                 {
-                    { "1", "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 4, 8, 16, 6, 50, 14, DateTimeKind.Local).AddTicks(7073) },
-                    { "1234", "Beskrivelse4", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation4", "Event4", new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7416) },
-                    { "2", "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7396) },
-                    { "2345", "Beskrivelse5", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation5", "Event5", new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7419) },
-                    { "3", "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7410) },
-                    { "3456", "Beskrivelse6", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation6", "Event6", new DateTime(2019, 4, 8, 16, 6, 50, 17, DateTimeKind.Local).AddTicks(7422) }
+                    { "1", "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 4, 16, 13, 28, 38, 826, DateTimeKind.Local).AddTicks(218) },
+                    { "1234", "Beskrivelse4", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation4", "Event4", new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9884) },
+                    { "2", "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9861) },
+                    { "2345", "Beskrivelse5", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation5", "Event5", new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9887) },
+                    { "3", "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9878) },
+                    { "3456", "Beskrivelse6", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation6", "Event6", new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9893) }
                 });
 
             migrationBuilder.InsertData(
@@ -98,12 +97,12 @@ namespace PhotoBookDatabase.Migrations
 
             migrationBuilder.InsertData(
                 table: "Pictures",
-                columns: new[] { "PictureId", "EventPin", "TakerId", "URL" },
+                columns: new[] { "PictureId", "EventPin", "TakerId" },
                 values: new object[,]
                 {
-                    { 1, "1", 1, "wwwroot/Images/1.png" },
-                    { 2, "2", 2, "wwwroot/Images/2.png" },
-                    { 3, "3", 3, "wwwroot/Images/3.png" }
+                    { 1, "1", 1 },
+                    { 2, "2", 2 },
+                    { 3, "3", 3 }
                 });
 
             migrationBuilder.CreateIndex(

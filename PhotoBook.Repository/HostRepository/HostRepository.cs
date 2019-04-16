@@ -35,120 +35,104 @@ using PhotoBookDatabase.Model;
 
         #region Private Methods
 
-        private async Task<bool> IfAny()
+        private async Task<bool> IfAny(PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                bool result = await context.Hosts.AnyAsync();
-                return result;
-            }
+            bool result = await context.Hosts.AnyAsync();
+            return result;
         }
-        private async Task<bool> Exists(Host host)
+
+        private async Task<bool> ExistsByHost(Host host, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                bool result = await context.Hosts.AnyAsync(h => h.PictureTakerId == host.PictureTakerId);
-                return result;
-            }
+            bool result = await context.Hosts.AnyAsync(h => h.PictureTakerId == host.PictureTakerId);
+            return result;
         }
-        private async Task<bool> Exists(int id)
+
+        private async Task<bool> ExistsById(int id, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (await context.Hosts
-                    .AnyAsync(h => h.PictureTakerId == id))
-                    return true;
-                return false;
-            }
+            if (await context.Hosts
+                .AnyAsync(h => h.PictureTakerId == id))
+                return true;
+            return false;
         }
-        private async Task<bool> Exists(string name)
+
+        private async Task<bool> ExistsByEmail(string email, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (await context.Hosts
-                    .AnyAsync(h => h.Name == name))
-                    return true;
-                return false;
-            }
+            if (await context.Hosts
+                .AnyAsync(h => h.Email == email))
+                return true;
+            return false;
         }
+
 
 
         #endregion
 
         #region IHostRepository Implementation
-        /// <summary>
-        /// Hello
-        /// </summary>
-        /// <returns>Returns Iqueryable of host's, NULL if none</returns>
-        public async Task<IQueryable<Host>> GetHosts()
+        public async Task<IEnumerable<Host>> GetHosts()
         {
-            if (IfAny().Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (IfAny(context).Result)
                 {
                     var hosts = await context.Hosts.ToListAsync();
 
                     return hosts.AsQueryable();
-                }  
+                }
             }
             return null;
         }
 
-        public async Task<Host> GetHost(int hostId)
+        public async Task<Host> GetHostById(int hostId)
         {
-            if (Exists(hostId).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsById(hostId, context).Result)
                 {
-
                     var host = await context.Hosts
                         .FindAsync(hostId);
 
                     return host;
                 }
             }
-
             return null;
         }
 
-        public async Task<Host> GetHost(string hostName)
+        public async Task<Host> GetHostByEmail(string email)
         {
-            if (Exists(hostName).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByEmail(email, context).Result)
                 {
-
                     var host = await context.Hosts
-                        .Where(x => x.Name == hostName)
+                        .Where(h => h.Email == email)
                         .FirstOrDefaultAsync();
 
                     return host;
                 }
             }
-
             return null;
         }
 
-        public async void InsertHost(Host host)
-        {
-            if (!Exists(host).Result)
-            {
-                using (var context = new PhotoBookDbContext(_options))
-                {
 
+
+        public async Task InsertHost(Host host)
+        {
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (!ExistsByHost(host,context).Result)
+                {
                     await context.Hosts.AddAsync(host);
                     await context.SaveChangesAsync();
                 }
             }
         }
 
-        public async void DeleteHost(int hostId)
+        public async Task DeleteHostById(int hostId)
         {
-            if (Exists(hostId).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsById(hostId,context).Result)
                 {
-
                     var host = context.Hosts
                         .FindAsync(hostId).Result;
 
@@ -158,15 +142,14 @@ using PhotoBookDatabase.Model;
             }
         }
 
-        public async void DeleteHost(string hostName)
+        public async Task DeleteHostByEmail(string email)
         {
-            if (Exists(hostName).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByEmail(email,context).Result)
                 {
-
                     var host = context.Hosts
-                        .Where(x => x.Name == hostName)
+                        .Where(x => x.Email == email)
                         .FirstOrDefaultAsync().Result;
 
                     context.Hosts.Remove(host);
@@ -175,13 +158,12 @@ using PhotoBookDatabase.Model;
             }
         }
 
-        public async void UpdateHost(Host host)
+        public async Task UpdateHost(Host host)
         {
-            if (Exists(host).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByHost(host,context).Result)
                 {
-
                     var entity = await context.Hosts.FirstOrDefaultAsync(
                         h => h.PictureTakerId == host.PictureTakerId);
 

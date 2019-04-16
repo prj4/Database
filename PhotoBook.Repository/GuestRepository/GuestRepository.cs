@@ -28,41 +28,41 @@ namespace PhotoBook.Repository.GuestRepository
 
         #region Private Methods
 
-        private async Task<bool> IfAny()
+        private async Task<bool> IfAny(PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                bool result = await context.Guests.AnyAsync();
-                return result;
-            }
+            bool result = await context.Guests.AnyAsync();
+            return result;
         }
-        private async Task<bool> Exists(Guest guest)
+
+        private async Task<bool> ExistsByGuest(Guest guest, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                bool result = await context.Guests.AnyAsync(g => g.PictureTakerId == guest.PictureTakerId);
-                return result;
-            }
+
+            bool result = await context.Guests.AnyAsync(g => g.PictureTakerId == guest.PictureTakerId);
+            return result;
         }
-        private async Task<bool> Exists(int id)
+
+        private async Task<bool> ExistsById(int id, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
+            if (await context.Guests
+                .AnyAsync(g => g.PictureTakerId == id))
+                return true;
+            return false;
+        }
+
+        private async Task<bool> ExistsByNameAndEventPin(string name, string eventPin, PhotoBookDbContext context)
+        {
+            
                 if (await context.Guests
-                    .AnyAsync(g => g.PictureTakerId == id))
+                    .AnyAsync(g => (g.Name == name) && (g.EventPin == eventPin)))
                     return true;
                 return false;
-            }
         }
-        private async Task<bool> Exists(string name)
+        private async Task<bool> ExistsByName(string name, PhotoBookDbContext context)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (await context.Guests
+            if (await context.Guests
                     .AnyAsync(g => g.Name == name))
                     return true;
                 return false;
-            }
         }
 
 
@@ -70,55 +70,54 @@ namespace PhotoBook.Repository.GuestRepository
 
         #region IGuestRepository Implementation
 
-        public async Task<IQueryable<Guest>> GetGuests()
+        public async Task<IEnumerable<Guest>> GetGuests()
         {
-            if (IfAny().Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
-                {
+                if (IfAny(context).Result)
+                { 
                     var guests = await context.Guests.ToListAsync();
-                    return guests.AsQueryable();
+                    return guests;
                 }
             }
             return null;
         }
 
-        public async Task<Guest> GetGuest(int id)
+        public async Task<Guest> GetGuestById(int id)
         {
-            if (Exists(id).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsById(id, context).Result)
                 {
                     var guest = await context.Guests
                         .FindAsync(id);
                     return guest;
-                }  
-            }
-            return null;
-        }
-
-        public async Task<Guest> GetGuest(string name)
-        {
-            if (Exists(name).Result)
-            {
-                using (var context = new PhotoBookDbContext(_options))
-                {
-
-                    var guest = await context.Guests
-                        .Where(x => x.Name == name)
-                        .FirstOrDefaultAsync();
-
-                    return guest;
                 }
             }
             return null;
         }
 
-        public async void InsertGuest(Guest guest)
+        
+        public async Task<Guest> GetGuestByNameAndEventPin(string name, string eventPin)
         {
-            if (!Exists(guest).Result)
-            {
                 using (var context = new PhotoBookDbContext(_options))
+                {
+                    if (ExistsByNameAndEventPin(name, eventPin, context).Result)
+                    {
+                        var guest = await context.Guests
+                            .Where(x => x.Name == name)
+                            .FirstOrDefaultAsync();
+                        return guest;
+                    }
+                }
+            return null;
+        }
+
+        public async Task InsertGuest(Guest guest)
+        {
+            using (var context = new PhotoBookDbContext(_options))
+            {
+                if (!ExistsByGuest(guest, context).Result)
                 {
                     await context.Guests.AddAsync(guest);
                     await context.SaveChangesAsync();
@@ -126,11 +125,11 @@ namespace PhotoBook.Repository.GuestRepository
             }
         }
 
-        public async void DeleteGuest(int id)
+        public async Task DeleteGuestById(int id)
         {
-            if (Exists(id).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsById(id, context).Result)
                 {
                     var guest = context.Guests
                         .FindAsync(id).Result;
@@ -141,14 +140,15 @@ namespace PhotoBook.Repository.GuestRepository
             }
         }
 
-        public async void DeleteGuest(string name)
+        public async Task DeleteGuestByNameAndEventPin(string name, string eventPin)
         {
-            if (Exists(name).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByNameAndEventPin(name, eventPin, context).Result)
                 {
                     var guest = context.Guests
-                        .Where(x => x.Name == name)
+                        .Where(x => (x.Name == name) &&
+                                    (x.EventPin == eventPin))
                         .FirstOrDefaultAsync().Result;
 
                     context.Guests.Remove(guest);
@@ -157,13 +157,12 @@ namespace PhotoBook.Repository.GuestRepository
             }
         }
 
-        public async void UpdateGuest(Guest guest)
+        public async Task UpdateGuest(Guest guest)
         {
-            if (Exists(guest).Result)
+            using (var context = new PhotoBookDbContext(_options))
             {
-                using (var context = new PhotoBookDbContext(_options))
+                if (ExistsByGuest(guest,context).Result)
                 {
-
                     var entity = await context.Guests.FindAsync(guest.PictureTakerId);
 
                     entity.Name = guest.Name;

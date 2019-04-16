@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -51,7 +52,7 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertEvent(eve);
 
-            IQueryable<Event> events = _uut.GetEvents().Result;
+            IEnumerable<Event> events = _uut.GetEvents().Result;
 
             bool result = events.Any(e => e.Name == eve.Name);
 
@@ -63,7 +64,7 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertEvent(eve);
 
-            IQueryable<Event> events = _uut.GetEvents().Result;
+            IEnumerable<Event> events = _uut.GetEvents().Result;
 
             bool result = events.Any(e => e.Pin == eve.Pin);
 
@@ -73,10 +74,10 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("EventSource")]
         public void GetEventByPin_AddFindCompare_ReturnsTrue(Event eve)
         {
-            if (_uut.GetEvent(eve.Pin) != null)
+            if (_uut.GetEventByPin(eve.Pin) != null)
                 _uut.InsertEvent(eve);
 
-            var result = _uut.GetEvent(eve.Pin).Result;
+            var result = _uut.GetEventByPin(eve.Pin).Result;
 
             Assert.AreEqual(eve.Pin, result.Pin);
         }
@@ -87,9 +88,9 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertEvent(eve);
 
-            _uut.DeleteEvent(eve.Pin);
+            _uut.DeleteEventByPin(eve.Pin);
 
-            IQueryable<Event> result = _uut.GetEvents().Result;
+            IEnumerable<Event> result = _uut.GetEvents().Result;
 
             Assert.AreEqual(null, result);
         }
@@ -100,13 +101,13 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertEvent(eve);
 
-            var tempEve = _uut.GetEvent(eve.Pin).Result;
+            var tempEve = _uut.GetEventByPin(eve.Pin).Result;
 
             tempEve.Description = "NewDescription1";
 
             _uut.UpdateEvent(tempEve);
 
-            var result = _uut.GetEvent(eve.Pin).Result;
+            var result = _uut.GetEventByPin(eve.Pin).Result;
 
             Assert.AreEqual("NewDescription1", result.Description);
         }
@@ -118,7 +119,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void GetEventById_TryingToGetNonExistingEvent_ReturnsNull()
         {
-            var result = _uut.GetEvent("1").Result;
+            var result = _uut.GetEventByPin("1").Result;
 
             Assert.AreEqual(null, result);
         }
@@ -126,7 +127,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void GetEventByName_TryingToGetNonExistingEvent_ReturnsNull()
         {
-            var result = _uut.GetEvent("Test").Result;
+            var result = _uut.GetEventByPin("Test").Result;
 
             Assert.AreEqual(null, result);
         }
@@ -146,7 +147,7 @@ namespace PhotoBook.Test.Repository.InMemory
             _uut.InsertEvent(Event1);
             _uut.InsertEvent(Event2);
 
-            var events = _uut.GetEvents(Event1.HostId).Result;
+            var events = _uut.GetEventsByHostId(Event1.HostId).Result;
 
 
 

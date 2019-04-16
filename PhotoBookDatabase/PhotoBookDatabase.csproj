@@ -12,6 +12,7 @@
     <Compile Remove="Migrations\20190408134105_Initial.cs" />
     <Compile Remove="Migrations\20190408134815_Ba.cs" />
     <Compile Remove="Migrations\20190408135036_Base.cs" />
+    <Compile Remove="Migrations\20190408140650_Base.cs" />
     <Compile Remove="Model\EventGuest.cs" />
     <Compile Remove="Model\EventGuests.cs" />
     <Compile Remove="Program.cs" />

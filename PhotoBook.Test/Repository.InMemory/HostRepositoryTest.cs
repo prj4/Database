@@ -38,7 +38,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [SetUp]
         public void Setup()
         {
-            _uut = new HostRepository(_InMemoryOptions);
+            _uut = new HostRepository(new PhotoBookDbContext(_InMemoryOptions));
         }
 
         [TearDown]

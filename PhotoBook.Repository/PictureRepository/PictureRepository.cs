@@ -13,40 +13,35 @@ using PhotoBookDatabase.Model;
 namespace PhotoBook.Repository.PictureRepository
 {
     public class PictureRepository : IPictureRepository
-    { 
-        private DbContextOptions<PhotoBookDbContext> _options;
+    {
+        private PhotoBookDbContext _context;
 
         /*Constructor needed for test with InMemory*/
-        internal PictureRepository(DbContextOptions<PhotoBookDbContext> options)
-        {
-            _options = options;
-        }
+        
 
 
-        public PictureRepository(string connectionString)
+        public PictureRepository(PhotoBookDbContext context)
         {
-            _options = new DbContextOptionsBuilder<PhotoBookDbContext>()
-                .UseSqlServer(connectionString)
-                .Options;
+            _context = context;
         }
 
         #region Private Methods
 
-        private async Task<bool> IfAny(PhotoBookDbContext context)
+        private async Task<bool> IfAny()
         {
-            bool result = await context.Pictures.AnyAsync();
+            bool result = await _context.Pictures.AnyAsync();
             return result;
         }
 
-        private async Task<bool> ExistsByPicture(Picture picture, PhotoBookDbContext context)
+        private async Task<bool> ExistsByPicture(Picture picture)
         {
-            bool result = await context.Pictures.AnyAsync(p => p.PictureId == picture.PictureId);
+            bool result = await _context.Pictures.AnyAsync(p => p.PictureId == picture.PictureId);
             return result;
         }
 
-        private async Task<bool> ExistsById(int id, PhotoBookDbContext context)
+        private async Task<bool> ExistsById(int id)
         {
-            if (await context.Pictures
+            if (await _context.Pictures
                 .AnyAsync(p => p.PictureId == id))
                 return true;
             return false;
@@ -58,67 +53,60 @@ namespace PhotoBook.Repository.PictureRepository
 
         public async Task<IEnumerable<Picture>> GetPictures()
         {
-            using (var context = new PhotoBookDbContext(_options))
+            if (IfAny().Result)
             {
-                if (IfAny(context).Result)
-                {
-                    var Pictures = await context.Pictures.ToListAsync();
+                var Pictures = await _context.Pictures.ToListAsync();
 
-                    return Pictures.AsEnumerable();
-                }
+                return Pictures.AsEnumerable();
             }
+
             return null;
         }
 
         public async Task<Picture> GetPictureById(int pictureId)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (ExistsById(pictureId, context).Result)
-                {
-                    var Picture = await context.Pictures
-                        .FindAsync(pictureId);
 
-                    return Picture;
-                }
+            if (ExistsById(pictureId).Result)
+            {
+                var Picture = await _context.Pictures
+                    .FindAsync(pictureId);
+                return Picture;
             }
+
             return null;
         }
 
 
         public async Task<int> InsertPicture(Picture picture)
         {
-            using (var context = new PhotoBookDbContext(_options))
-            {
-                if (!ExistsByPicture(picture, context).Result)
-                {
-                    await context.Pictures.AddAsync(picture);
-                    await context.SaveChangesAsync();
 
-                    return picture.PictureId;
-                }
+            if (!ExistsByPicture(picture).Result)
+            {
+                await _context.Pictures.AddAsync(picture);
+                await _context.SaveChangesAsync();
+
+                return picture.PictureId;
             }
+
             return -1;
         }
 
         public async Task DeletePictureById(int pictureId)
         {
-            using (var context = new PhotoBookDbContext(_options))
+            if (ExistsById(pictureId).Result)
             {
-                if (ExistsById(pictureId, context).Result)
-                {
-                    var picture = context.Pictures
-                        .FindAsync(pictureId).Result;
+                var picture = _context.Pictures
+                    .FindAsync(pictureId).Result;
 
-                    context.Pictures.Remove(picture);
-                    await context.SaveChangesAsync();
-                }
+                _context.Pictures.Remove(picture);
+                await _context.SaveChangesAsync();
             }
+
         }
 
-        
 
-        
+
+
         #endregion
     }
 }

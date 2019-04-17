@@ -48,7 +48,7 @@ namespace PhotoBookDatabase.Data
                 .HasOne<Event>(g => g.Event)
                 .WithMany(e => e.Guests)
                 .HasForeignKey(g => g.EventPin)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Guest>().HasData(
                 new Guest { Name = "Guest1", PictureTakerId = 5, EventPin = "1"},
@@ -64,7 +64,7 @@ namespace PhotoBookDatabase.Data
                 .HasMany(e => e.Pictures)
                 .WithOne(p => p.Event)
                 .HasForeignKey(p => p.EventPin)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             
 
@@ -91,7 +91,7 @@ namespace PhotoBookDatabase.Data
                 .HasMany(h => h.Events)
                 .WithOne(h => h.Host)
                 .HasForeignKey(e => e.HostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             modelBuilder.Entity<Host>()
@@ -123,17 +123,10 @@ namespace PhotoBookDatabase.Data
         void PictureOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Picture>()
-                .HasOne(p => p.PictureTaker)
-                .WithMany(p => p.Pictures)
+                .HasOne<PictureTaker>(p => p.PictureTaker)
+                .WithMany(pt => pt.Pictures)
                 .HasForeignKey(p => p.TakerId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
-            modelBuilder.Entity<Picture>()
-                .HasOne(p => p.Event)
-                .WithMany(p => p.Pictures)
-                .HasForeignKey(p => p.EventPin)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Picture>()
                 .HasData(

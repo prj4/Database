@@ -12,6 +12,7 @@ namespace PhotoBookDatabase.Model
         public int PictureTakerId { get; set; }
         [Required]
         public String Name { get; set; }
+        
         public List<Picture> Pictures { get; set; }
     }
 }

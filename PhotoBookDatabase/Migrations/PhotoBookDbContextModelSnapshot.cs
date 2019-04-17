@@ -53,7 +53,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation1",
                             Name = "Event1",
-                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 826, DateTimeKind.Local).AddTicks(218)
+                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 587, DateTimeKind.Local).AddTicks(3896)
                         },
                         new
                         {
@@ -63,7 +63,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation2",
                             Name = "Event2",
-                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9861)
+                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8773)
                         },
                         new
                         {
@@ -73,7 +73,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation3",
                             Name = "Event3",
-                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9878)
+                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8814)
                         },
                         new
                         {
@@ -83,7 +83,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation4",
                             Name = "Event4",
-                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9884)
+                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8828)
                         },
                         new
                         {
@@ -93,7 +93,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation5",
                             Name = "Event5",
-                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9887)
+                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8843)
                         },
                         new
                         {
@@ -103,7 +103,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation6",
                             Name = "Event6",
-                            StartDate = new DateTime(2019, 4, 16, 13, 28, 38, 828, DateTimeKind.Local).AddTicks(9893)
+                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8857)
                         });
                 });
 
@@ -113,10 +113,9 @@ namespace PhotoBookDatabase.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("EventPin")
-                        .IsRequired();
+                    b.Property<string>("EventPin");
 
-                    b.Property<int>("TakerId");
+                    b.Property<int?>("TakerId");
 
                     b.HasKey("PictureId");
 
@@ -243,7 +242,7 @@ namespace PhotoBookDatabase.Migrations
                     b.HasOne("PhotoBookDatabase.Model.Host", "Host")
                         .WithMany("Events")
                         .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("PhotoBookDatabase.Model.Picture", b =>
@@ -254,14 +253,16 @@ namespace PhotoBookDatabase.Migrations
 
                     b.HasOne("PhotoBookDatabase.Model.PictureTaker", "PictureTaker")
                         .WithMany("Pictures")
-                        .HasForeignKey("TakerId");
+                        .HasForeignKey("TakerId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("PhotoBookDatabase.Model.Guest", b =>
                 {
                     b.HasOne("PhotoBookDatabase.Model.Event", "Event")
                         .WithMany("Guests")
-                        .HasForeignKey("EventPin");
+                        .HasForeignKey("EventPin")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 #pragma warning restore 612, 618
         }

@@ -77,12 +77,12 @@ namespace PhotoBookDatabase.Migrations
                 columns: new[] { "Pin", "Description", "EndDate", "HostId", "Location", "Name", "StartDate" },
                 values: new object[,]
                 {
-                    { "1", "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 4, 17, 7, 42, 35, 587, DateTimeKind.Local).AddTicks(3896) },
-                    { "1234", "Beskrivelse4", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation4", "Event4", new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8828) },
-                    { "2", "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8773) },
-                    { "2345", "Beskrivelse5", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation5", "Event5", new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8843) },
-                    { "3", "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8814) },
-                    { "3456", "Beskrivelse6", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation6", "Event6", new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8857) }
+                    { "1", "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 4, 17, 9, 22, 22, 202, DateTimeKind.Local).AddTicks(6784) },
+                    { "1234", "Beskrivelse4", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation4", "Event4", new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8417) },
+                    { "2", "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8389) },
+                    { "2345", "Beskrivelse5", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation5", "Event5", new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8424) },
+                    { "3", "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8413) },
+                    { "3456", "Beskrivelse6", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation6", "Event6", new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8428) }
                 });
 
             migrationBuilder.InsertData(
@@ -154,7 +154,7 @@ namespace PhotoBookDatabase.Migrations
                 column: "EventPin",
                 principalTable: "Events",
                 principalColumn: "Pin",
-                onDelete: ReferentialAction.SetNull);
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

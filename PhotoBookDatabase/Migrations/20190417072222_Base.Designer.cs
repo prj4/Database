@@ -10,7 +10,7 @@ using PhotoBookDatabase.Data;
 namespace PhotoBookDatabase.Migrations
 {
     [DbContext(typeof(PhotoBookDbContext))]
-    [Migration("20190417054236_Base")]
+    [Migration("20190417072222_Base")]
     partial class Base
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation1",
                             Name = "Event1",
-                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 587, DateTimeKind.Local).AddTicks(3896)
+                            StartDate = new DateTime(2019, 4, 17, 9, 22, 22, 202, DateTimeKind.Local).AddTicks(6784)
                         },
                         new
                         {
@@ -65,7 +65,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation2",
                             Name = "Event2",
-                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8773)
+                            StartDate = new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8389)
                         },
                         new
                         {
@@ -75,7 +75,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation3",
                             Name = "Event3",
-                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8814)
+                            StartDate = new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8413)
                         },
                         new
                         {
@@ -85,7 +85,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 1,
                             Location = "Lokation4",
                             Name = "Event4",
-                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8828)
+                            StartDate = new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8417)
                         },
                         new
                         {
@@ -95,7 +95,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 2,
                             Location = "Lokation5",
                             Name = "Event5",
-                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8843)
+                            StartDate = new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8424)
                         },
                         new
                         {
@@ -105,7 +105,7 @@ namespace PhotoBookDatabase.Migrations
                             HostId = 3,
                             Location = "Lokation6",
                             Name = "Event6",
-                            StartDate = new DateTime(2019, 4, 17, 7, 42, 35, 590, DateTimeKind.Local).AddTicks(8857)
+                            StartDate = new DateTime(2019, 4, 17, 9, 22, 22, 204, DateTimeKind.Local).AddTicks(8428)
                         });
                 });
 
@@ -251,7 +251,8 @@ namespace PhotoBookDatabase.Migrations
                 {
                     b.HasOne("PhotoBookDatabase.Model.Event", "Event")
                         .WithMany("Pictures")
-                        .HasForeignKey("EventPin");
+                        .HasForeignKey("EventPin")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhotoBookDatabase.Model.PictureTaker", "PictureTaker")
                         .WithMany("Pictures")
@@ -264,7 +265,7 @@ namespace PhotoBookDatabase.Migrations
                     b.HasOne("PhotoBookDatabase.Model.Event", "Event")
                         .WithMany("Guests")
                         .HasForeignKey("EventPin")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }

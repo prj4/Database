@@ -26,8 +26,7 @@ namespace PhotoBookDatabase.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=tcp:katrinesphotobook.database.windows.net,1433;Initial Catalog=PhotoBook5;Persist Security Info=False;User ID=Ingeniørhøjskolen@katrinesphotobook.database.windows.net;Password=Katrinebjergvej22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
-                
+                optionsBuilder.UseSqlServer("Server=tcp:katrinesphotobook.database.windows.net,1433;Initial Catalog=PhotoBook5;Persist Security Info=False;User ID=Ingeniørhøjskolen@katrinesphotobook.database.windows.net;Password=Katrinebjergvej22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");  
             }   
         }
 
@@ -48,7 +47,7 @@ namespace PhotoBookDatabase.Data
                 .HasOne<Event>(g => g.Event)
                 .WithMany(e => e.Guests)
                 .HasForeignKey(g => g.EventPin)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Guest>().HasData(
                 new Guest { Name = "Guest1", PictureTakerId = 5, EventPin = "1"},
@@ -64,10 +63,7 @@ namespace PhotoBookDatabase.Data
                 .HasMany(e => e.Pictures)
                 .WithOne(p => p.Event)
                 .HasForeignKey(p => p.EventPin)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
-            
-
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Event>().HasData(
                 new Event { Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = "1", StartDate = DateTime.Now, EndDate = DateTime.MaxValue },

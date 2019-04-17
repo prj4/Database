@@ -82,7 +82,8 @@ namespace PhotoBook.Repository.EventRepository
             if (ExistsByPin(eventPin).Result)
             {
                 var eve = await _context.Events
-                    .FindAsync(eventPin);
+                    .Include(e => e.Pictures)
+                    .SingleOrDefaultAsync(e => e.Pin == eventPin);
                 return eve;
             }
             return null;

@@ -15,7 +15,6 @@ namespace PhotoBookDatabase.Data
         public DbSet<Guest> Guests { get; set; }
         public DbSet<Host> Hosts { get; set; }
         public DbSet<Picture> Pictures { get; set; }
-        public DbSet<PictureTaker> PictureTakers { get; set; }
         
 
         public PhotoBookDbContext()
@@ -41,18 +40,17 @@ namespace PhotoBookDatabase.Data
         void GuestOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Guest>()
-                .HasBaseType<PictureTaker>();
-
-            modelBuilder.Entity<Guest>()
                 .HasOne<Event>(g => g.Event)
                 .WithMany(e => e.Guests)
                 .HasForeignKey(g => g.EventPin)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
+
+            
 
             modelBuilder.Entity<Guest>().HasData(
-                new Guest { Name = "Guest1", PictureTakerId = 5, EventPin = "1"},
-                new Guest { Name = "Guest2", PictureTakerId = 6, EventPin = "2" },
-                new Guest { Name = "Guest3", PictureTakerId = 7, EventPin = "3" }
+                new Guest { Name = "Guest1", GuestId = 1, EventPin = "1"},
+                new Guest { Name = "Guest2", GuestId = 2, EventPin = "2" },
+                new Guest { Name = "Guest3", GuestId = 3, EventPin = "3" }
                 );
 
         }
@@ -63,7 +61,7 @@ namespace PhotoBookDatabase.Data
                 .HasMany(e => e.Pictures)
                 .WithOne(p => p.Event)
                 .HasForeignKey(p => p.EventPin)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Event>().HasData(
                 new Event { Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = "1", StartDate = DateTime.Now, EndDate = DateTime.MaxValue },
@@ -77,8 +75,6 @@ namespace PhotoBookDatabase.Data
 
         void HostOnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Host>()
-                .HasBaseType<PictureTaker>();
 
             modelBuilder.Entity<Host>(h =>
                 h.HasIndex(e => e.Email).IsUnique());
@@ -87,7 +83,9 @@ namespace PhotoBookDatabase.Data
                 .HasMany(h => h.Events)
                 .WithOne(h => h.Host)
                 .HasForeignKey(e => e.HostId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
+
+            
 
 
             modelBuilder.Entity<Host>()
@@ -95,22 +93,22 @@ namespace PhotoBookDatabase.Data
                     new Host
                     {
                         Email = "Email1@email.com", Name = "Host1",
-                        PictureTakerId = 1
+                        HostId = 1
                     },
                     new Host
                     {
                         Email = "Email2@email.com", Name = "Host2",
-                        PictureTakerId = 2
+                        HostId = 2
                     },
                     new Host
                     {
                         Email = "Email3@email.com", Name = "Host3",
-                        PictureTakerId = 3
+                        HostId = 3
                     },
                     new Host
                     {
                         Email = "Email5@email.com", Name = "Host5",
-                        PictureTakerId = 4
+                        HostId = 4
                     }
                 );
 
@@ -119,16 +117,10 @@ namespace PhotoBookDatabase.Data
         void PictureOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Picture>()
-                .HasOne<PictureTaker>(p => p.PictureTaker)
-                .WithMany(pt => pt.Pictures)
-                .HasForeignKey(p => p.TakerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Picture>()
                 .HasData(
-                    new Picture {PictureId = 1, EventPin = "1", TakerId = 1},
-                    new Picture {PictureId = 2, EventPin = "2", TakerId = 2},
-                    new Picture {PictureId = 3, EventPin = "3", TakerId = 3}
+                    new Picture {PictureId = 1, EventPin = "1", HostId = 1},
+                    new Picture {PictureId = 2, EventPin = "2", HostId = 2},
+                    new Picture {PictureId = 3, EventPin = "3", HostId = 3}
                 );
         }
     }

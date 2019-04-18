@@ -6,11 +6,15 @@ using System.Text;
 
 namespace PhotoBookDatabase.Model
 {
-    public class Guest : PictureTaker
+    public class Guest
     {
+        public int GuestId { get; set; }
+        [Required]
+        public string Name { get; set; }
         [Required]
         public string EventPin { get; set; }
         public Event Event { get; set; }
+
         
     }
 }

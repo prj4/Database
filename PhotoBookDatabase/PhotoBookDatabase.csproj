@@ -9,24 +9,7 @@
 
   <ItemGroup>
     <Compile Remove="Commands.cs" />
-    <Compile Remove="Migrations\20190408134105_Initial.cs" />
-    <Compile Remove="Migrations\20190408134815_Ba.cs" />
-    <Compile Remove="Migrations\20190408135036_Base.cs" />
-    <Compile Remove="Migrations\20190408140650_Base.cs" />
-    <Compile Remove="Migrations\20190416112839_initial.cs" />
-    <Compile Remove="Migrations\20190416164737_Initial.cs" />
-    <Compile Remove="Migrations\20190416170724_Ba.cs" />
-    <Compile Remove="Migrations\20190416171003_Bas.cs" />
-    <Compile Remove="Migrations\20190416171458_Ba.cs" />
-    <Compile Remove="Migrations\20190416171622_Base.cs" />
-    <Compile Remove="Migrations\20190416172043_Base.cs" />
-    <Compile Remove="Migrations\20190416172243_Bae.cs" />
-    <Compile Remove="Migrations\20190416172307_Base.cs" />
-    <Compile Remove="Migrations\20190416173807_Bae.cs" />
-    <Compile Remove="Migrations\20190417054047_Base.cs" />
-    <Compile Remove="Migrations\20190417054128_Base.cs" />
-    <Compile Remove="Migrations\20190417054236_Base.cs" />
-    <Compile Remove="Migrations\20190417065351_Base.cs" />
+    <Compile Remove="Migrations\20190418111409_Base.cs" />
     <Compile Remove="Model\EventGuest.cs" />
     <Compile Remove="Model\EventGuests.cs" />
     <Compile Remove="Program.cs" />

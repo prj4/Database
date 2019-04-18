@@ -47,30 +47,93 @@ namespace PhotoBook.Repository.PictureRepository
             return false;
         }
 
+        private async Task<bool> ExistsByEventPin(string eventPin)
+        {
+            if (await _context.Pictures
+                .AnyAsync(p => p.EventPin == eventPin))
+                return true;
+            return false;
+        }
+
+        private async Task<bool> ExistsByEventPinAndHostId(string eventPin, int hostId)
+        {
+            if (await _context.Pictures
+                .AnyAsync(p => (p.EventPin == eventPin) && (p.HostId == hostId)))
+                return true;
+            return false;
+        }
+
+        private async Task<bool> ExistsByEventPinAndGuestId(string eventPin, int guestId)
+        {
+            if (await _context.Pictures
+                .AnyAsync(p => (p.EventPin == eventPin) && (p.GuestId == guestId)))
+                return true;
+            return false;
+        }
         #endregion
 
         #region IPictureRepository Implementation
 
         public async Task<IEnumerable<Picture>> GetPictures()
         {
-            if (IfAny().Result)
+            if (await IfAny())
             {
-                var Pictures = await _context.Pictures.ToListAsync();
+                var pictures = await _context.Pictures.ToListAsync();
 
-                return Pictures.AsEnumerable();
+                return pictures.AsEnumerable();
             }
 
+            return null;
+        }
+
+        public async Task<IEnumerable<Picture>> GetPicturesByEventPin(string eventPin)
+        {
+            if (await ExistsByEventPin(eventPin))
+            {
+                var pictures = await _context.Pictures.Where(
+                    p => p.EventPin == eventPin).
+                    ToListAsync();
+
+                return pictures.AsEnumerable();
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<Picture>> GetPicturesByEventPinAndHostId(string eventPin, int hostId)
+        {
+            if (await ExistsByEventPinAndHostId(eventPin, hostId))
+            {
+                var pictures = await _context.Pictures.Where(
+                        p => (p.EventPin == eventPin) && (p.HostId == hostId)).
+                    ToListAsync();
+
+                return pictures.AsEnumerable();
+            }
+            return null;
+        }
+
+        public async Task<IEnumerable<Picture>> GetPicturesByEventPinAndGuestId(string eventPin, int guestId)
+        {
+            if (await ExistsByEventPinAndGuestId(eventPin, guestId))
+            {
+                var pictures = await _context.Pictures.Where(
+                        p => (p.EventPin == eventPin) && (p.GuestId == guestId)).
+                    ToListAsync();
+
+                return pictures.AsEnumerable();
+            }
             return null;
         }
 
         public async Task<Picture> GetPictureById(int pictureId)
         {
 
-            if (ExistsById(pictureId).Result)
+            if (await ExistsById(pictureId))
             {
-                var Picture = await _context.Pictures
+                var picture = await _context.Pictures
                     .FindAsync(pictureId);
-                return Picture;
+                return picture;
             }
 
             return null;
@@ -104,6 +167,7 @@ namespace PhotoBook.Repository.PictureRepository
 
         }
 
+        
 
 
 

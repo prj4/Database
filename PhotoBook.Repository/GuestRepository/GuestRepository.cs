@@ -30,14 +30,14 @@ namespace PhotoBook.Repository.GuestRepository
         private async Task<bool> ExistsByGuest(Guest guest)
         {
 
-            bool result = await _context.Guests.AnyAsync(g => g.PictureTakerId == guest.PictureTakerId);
+            bool result = await _context.Guests.AnyAsync(g => g.GuestId == guest.GuestId);
             return result;
         }
 
         private async Task<bool> ExistsById(int id)
         {
             if (await _context.Guests
-                .AnyAsync(g => g.PictureTakerId == id))
+                .AnyAsync(g => g.GuestId == id))
                 return true;
             return false;
         }
@@ -140,7 +140,7 @@ namespace PhotoBook.Repository.GuestRepository
         {
             if (ExistsByGuest(guest).Result)
             {
-                var entity = await _context.Guests.FindAsync(guest.PictureTakerId);
+                var entity = await _context.Guests.FindAsync(guest.GuestId);
 
                 entity.Name = guest.Name;
                 _context.Update(entity);

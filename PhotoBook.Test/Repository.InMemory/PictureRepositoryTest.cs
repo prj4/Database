@@ -30,9 +30,9 @@ namespace PhotoBook.Test.Repository.InMemory
 
         private static Picture[] PictureSource =
         {
-            new Picture {EventPin = "1", TakerId = 1},
-            new Picture {EventPin = "2", TakerId = 2},
-            new Picture {EventPin = "3", TakerId = 3}
+            new Picture {EventPin = "1", HostId = 1},
+            new Picture {EventPin = "2", HostId = 2},
+            new Picture {EventPin = "3", HostId = 3}
         };
 
         #endregion
@@ -59,9 +59,51 @@ namespace PhotoBook.Test.Repository.InMemory
         [TestCase(3)]
         public void GetPictures_GettingListOfPicturesAndFindingSpecific_ReturnsTrue(int pictureId)
         {
-            IEnumerable<Picture> Pictures = _uut.GetPictures().Result;
+            IEnumerable<Picture> pictures = _uut.GetPictures().Result;
 
-            bool result = Pictures.Any(p => p.PictureId == pictureId);
+            bool result = pictures.Any(p => p.PictureId == pictureId);
+
+            Assert.True(result);
+        }
+
+        [TestCase("1")]
+        [TestCase("2")]
+        [TestCase("3")]
+        public void GetPicturesByEventPin_GettingListOfPicturesAndFindingSpecific_ReturnsTrue(string eventPin)
+        {
+            IEnumerable<Picture> pictures = _uut.GetPicturesByEventPin(eventPin).Result;
+
+            bool result = pictures.Any(p => p.EventPin == eventPin);
+
+            Assert.True(result);
+        }
+
+        [TestCase("1",1)]
+        [TestCase("2",2)]
+        [TestCase("3",3)]
+        public void GetPicturesByEventPinAndHostId_GettingListOfPicturesAndFindingSpecific_ReturnsTrue(string eventPin, int hostId)
+        {
+            IEnumerable<Picture> pictures = _uut.GetPicturesByEventPinAndHostId(eventPin,hostId).Result;
+
+            bool result = pictures.Any(p => (p.EventPin == eventPin) && (p.HostId == hostId));
+
+            Assert.True(result);
+        }
+
+        [TestCase("1", 1)]
+        [TestCase("2", 2)]
+        [TestCase("3", 3)]
+        public void GetPicturesByEventPinAndGuestId_InsertingPicturesGettingListOfPicturesAndFindingSpecific_ReturnsTrue(string eventPin, int guestId)
+        {
+            _uut.InsertPicture(new Picture
+            {
+                EventPin = eventPin,
+                GuestId = guestId
+            });
+
+            IEnumerable<Picture> pictures = _uut.GetPicturesByEventPinAndGuestId(eventPin, guestId).Result;
+
+            bool result = pictures.Any(p => (p.EventPin == eventPin) && (p.GuestId == guestId));
 
             Assert.True(result);
         }
@@ -78,13 +120,11 @@ namespace PhotoBook.Test.Repository.InMemory
             Assert.True(result);
         }
 
-        [TestCase(4)]
-        [TestCase(5)]
-        [TestCase(6)]
-        public async Task InsertPicture_InsertPicture_ReturnsPictureId(int expected)
+        [Test]
+        public async Task InsertPicture_InsertPicture_ReturnsPictureId()
         {
-
-            var picture = new Picture {EventPin = "1", TakerId = 1};
+            var expected = _uut.GetPictures().Result.Count() + 1;
+            var picture = new Picture {EventPin = "1", HostId = 1};
             var result = await _uut.InsertPicture(picture);
 
             Assert.AreEqual(expected,result);

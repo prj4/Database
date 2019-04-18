@@ -67,7 +67,7 @@ namespace PhotoBook.Test.Repository.InMemory
 
             IEnumerable<Guest> guests = _uut.GetGuests().Result;
 
-            bool result = guests.Any(g => g.PictureTakerId == guest.PictureTakerId);
+            bool result = guests.Any(g => g.GuestId == guest.GuestId);
 
             Assert.True(result);
         }
@@ -76,9 +76,9 @@ namespace PhotoBook.Test.Repository.InMemory
         public void GetGuestById_AddFindCompare_ReturnsTrue(Guest guest)
         {
             _uut.InsertGuest(guest);
-            var result = _uut.GetGuestById(guest.PictureTakerId).Result;
+            var result = _uut.GetGuestById(guest.GuestId).Result;
 
-            Assert.AreEqual(guest.PictureTakerId, result.PictureTakerId);
+            Assert.AreEqual(guest.GuestId, result.GuestId);
         }
 
         [Test, TestCaseSource("GuestSource")]
@@ -87,7 +87,7 @@ namespace PhotoBook.Test.Repository.InMemory
             _uut.InsertGuest(guest);
             var result = _uut.GetGuestByNameAndEventPin(guest.Name, "1").Result;
 
-            Assert.AreEqual(guest.PictureTakerId, result.PictureTakerId);
+            Assert.AreEqual(guest.GuestId, result.GuestId);
         }
 
         [Test, TestCaseSource("GuestSource")]
@@ -95,7 +95,7 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertGuest(guest);
 
-            _uut.DeleteGuestById(guest.PictureTakerId);
+            _uut.DeleteGuestById(guest.GuestId);
 
             IEnumerable<Guest> result = _uut.GetGuests().Result;
 
@@ -117,9 +117,9 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void UpdateGuest_InsertChangeNameCheck_EqualsNewDescription()
         {
-            var GuestBefore = new Guest{PictureTakerId = 1, Name = "Guest1"};
+            var GuestBefore = new Guest{GuestId = 1, Name = "Guest1"};
 
-            var GuestAfter = new Guest {PictureTakerId = 1, Name = "NewGuest1" };
+            var GuestAfter = new Guest {GuestId = 1, Name = "NewGuest1" };
 
             _uut.InsertGuest(GuestBefore);
 

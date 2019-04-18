@@ -68,7 +68,7 @@ namespace PhotoBook.Test.Repository.InMemory
 
             IEnumerable<Host> hosts = _uut.GetHosts().Result;
 
-            bool result = hosts.Any(h => h.PictureTakerId == host.PictureTakerId);
+            bool result = hosts.Any(h => h.HostId == host.HostId);
 
             Assert.True(result);
         }
@@ -77,9 +77,9 @@ namespace PhotoBook.Test.Repository.InMemory
         public void GetHostById_AddFindCompare_ReturnsTrue(Host host)
         {
             _uut.InsertHost(host);
-            var tempHost = _uut.GetHostById(host.PictureTakerId).Result;
+            var tempHost = _uut.GetHostById(host.HostId).Result;
 
-            Assert.AreEqual(host.PictureTakerId,tempHost.PictureTakerId);
+            Assert.AreEqual(host.HostId,tempHost.HostId);
         }
 
         [Test, TestCaseSource("HostSource")]
@@ -88,7 +88,7 @@ namespace PhotoBook.Test.Repository.InMemory
             _uut.InsertHost(host);
             var tempHost = _uut.GetHostByEmail(host.Email).Result;
 
-            Assert.AreEqual(host.PictureTakerId, tempHost.PictureTakerId);
+            Assert.AreEqual(host.HostId, tempHost.HostId);
         }
 
         [Test, TestCaseSource("HostSource")]
@@ -96,7 +96,7 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             _uut.InsertHost(host);
 
-            _uut.DeleteHostById(host.PictureTakerId);
+            _uut.DeleteHostById(host.HostId);
 
             IEnumerable<Host> result = _uut.GetHosts().Result;
 
@@ -120,14 +120,14 @@ namespace PhotoBook.Test.Repository.InMemory
         {
             var hostBefore = new Host
             {
-                PictureTakerId = 4,
+                HostId = 4,
                 Email = "Email1@email.com",
                 Name = "Host",
             };
 
             var hostAfter = new Host
             {
-                PictureTakerId = 4,
+                HostId = 4,
                 Email = "NewEmail1@email.com",
                 Name = "Host",
             };
@@ -136,7 +136,7 @@ namespace PhotoBook.Test.Repository.InMemory
 
             _uut.UpdateHost(hostAfter);
 
-            var result = _uut.GetHostById(hostAfter.PictureTakerId).Result;
+            var result = _uut.GetHostById(hostAfter.HostId).Result;
 
             Assert.AreEqual("NewEmail1@email.com", result.Email);
         }

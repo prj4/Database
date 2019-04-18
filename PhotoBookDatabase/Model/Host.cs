@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace PhotoBookDatabase.Model
 {
-    public class Host : PictureTaker
+    public class Host
     {
+        public int HostId { get; set; }
+        public string Name { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set;}
-        public List<Event> Events { get; set; }     
+        public List<Event> Events { get; set; }  
+       
     }
 }

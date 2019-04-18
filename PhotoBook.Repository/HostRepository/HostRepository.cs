@@ -33,14 +33,14 @@ using PhotoBookDatabase.Model;
 
         private async Task<bool> ExistsByHost(Host host)
         {
-            bool result = await _context.Hosts.AnyAsync(h => h.PictureTakerId == host.PictureTakerId);
+            bool result = await _context.Hosts.AnyAsync(h => h.HostId == host.HostId);
             return result;
         }
 
         private async Task<bool> ExistsById(int id)
         {
             if (await _context.Hosts
-                .AnyAsync(h => h.PictureTakerId == id))
+                .AnyAsync(h => h.HostId == id))
                 return true;
             return false;
         }
@@ -139,7 +139,7 @@ using PhotoBookDatabase.Model;
             if (ExistsByHost(host).Result)
             {
                 var entity = await _context.Hosts.FirstOrDefaultAsync(
-                    h => h.PictureTakerId == host.PictureTakerId);
+                    h => h.HostId == host.HostId);
 
                 entity.Email = host.Email;
                 entity.Name = host.Name;

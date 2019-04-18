@@ -9,11 +9,10 @@ namespace PhotoBookDatabase.Model
     public class Picture
     {
         public int PictureId { get; set; }
-        
+        [Required]
         public string EventPin { get; set; }
         public Event Event { get; set; }
-       
-        public int? TakerId { get; set; }
-        public PictureTaker PictureTaker { get; set; }
+        public int GuestId { get; set; }
+        public int HostId { get; set; }
     }
 }

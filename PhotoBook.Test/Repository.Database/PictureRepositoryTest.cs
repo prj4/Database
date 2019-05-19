@@ -10,20 +10,19 @@ using PhotoBook.Repository.PictureRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace PhotoBook.Test.Repository.InMemory
+/*EN UNIT TEST AF GANGEN*/
+/*Need to have a seeded Event with pin "1,2,3" to run and Host with id "1,2,3"*/
+namespace PhotoBook.Test.Repository.Database
 {
     [TestFixture]
     class PictureRepositoryTest
     {
         private IPictureRepository _uut;
-        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+        
 
         public PictureRepositoryTest()
         {
-            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .Options;
+            
         }
 
         #region Sources
@@ -42,7 +41,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [SetUp]
         public void Setup()
         {
-            _uut = new PictureRepository(new PhotoBookDbContext(_InMemoryOptions));
+            _uut = new PictureRepository(new PhotoBookDbContext());
         }
 
         [TearDown]
@@ -99,7 +98,7 @@ namespace PhotoBook.Test.Repository.InMemory
             {
                 EventPin = eventPin,
                 GuestId = guestId
-            });
+            }).Wait();
 
             IEnumerable<Picture> pictures = _uut.GetPicturesByEventPinAndGuestId(eventPin, guestId).Result;
 
@@ -111,7 +110,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("PictureSource")]
         public void InsertPicture_InsertPictureAndFind_ReturnsTrue(Picture picture)
         {
-            _uut.InsertPicture(picture);
+            _uut.InsertPicture(picture).Wait();
 
             IEnumerable<Picture> Pictures = _uut.GetPictures().Result;
 
@@ -120,25 +119,29 @@ namespace PhotoBook.Test.Repository.InMemory
             Assert.True(result);
         }
 
-        [Test]
-        public async Task InsertPicture_InsertPicture_ReturnsPictureId()
-        {
-            var expected = _uut.GetPictures().Result.Count() + 1;
-            var picture = new Picture {EventPin = "1", HostId = 1};
-            var result = await _uut.InsertPicture(picture);
-
-            Assert.AreEqual(expected,result);
-        }
 
         [Test, TestCaseSource("PictureSource")]
         public void GetPictureById_AddFindCompare_ReturnsTrue(Picture picture)
         {
-            _uut.InsertPicture(picture);
+            _uut.InsertPicture(picture).Wait();
             var result = _uut.GetPictureById(picture.PictureId).Result;
 
             Assert.AreEqual(picture.PictureId, result.PictureId);
         }
-  
+
+        [Test, TestCaseSource("PictureSource")]
+        public void DeletePictureById_InserteDeleteCheckIfNothing_EqualsNull(Picture picture)
+        {
+            _uut.InsertPicture(picture).Wait();
+
+            _uut.DeletePictureById(picture.PictureId).Wait();
+
+            var result = _uut.GetPictureById(picture.PictureId).Result;
+
+            Assert.AreEqual(null, result);
+        }
+
+        
 
         #endregion
 

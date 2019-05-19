@@ -12,7 +12,9 @@ namespace PhotoBookDatabase.Model
         [Required]
         public string EventPin { get; set; }
         public Event Event { get; set; }
-        public int GuestId { get; set; }
-        public int HostId { get; set; }
+        public Guest Guest { get; set; }
+        public int? GuestId { get; set; }
+        public Host Host { get; set; }
+        public int? HostId { get; set; }
     }
 }

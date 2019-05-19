@@ -8,19 +8,18 @@ using PhotoBook.Repository.GuestRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace PhotoBook.Test.Repository.InMemory
+/*Need to have a seeded Event with pin "1" to run*/
+/*EN UNIT TEST AF GANGEN*/
+namespace PhotoBook.Test.Repository.Database
 {
     class GuestRepositoryTest
     {
         private IGuestRepository _uut;
-        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+        
 
         public GuestRepositoryTest()
         {
-            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .Options;
+            
         }
 
         #region Sources
@@ -38,7 +37,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [SetUp]
         public void Setup()
         {
-            _uut = new GuestRepository(new PhotoBookDbContext(_InMemoryOptions));
+            _uut = new GuestRepository(new PhotoBookDbContext());
         }
 
         [TearDown]
@@ -63,7 +62,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("GuestSource")]
         public void InsertGuest_InsertGuestAndFind_ReturnsTrue(Guest guest)
         {
-            _uut.InsertGuest(guest);
+            _uut.InsertGuest(guest).Wait();
 
             IEnumerable<Guest> guests = _uut.GetGuests().Result;
 
@@ -75,7 +74,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("GuestSource")]
         public void GetGuestById_AddFindCompare_ReturnsTrue(Guest guest)
         {
-            _uut.InsertGuest(guest);
+            _uut.InsertGuest(guest).Wait();
             var result = _uut.GetGuestById(guest.GuestId).Result;
 
             Assert.AreEqual(guest.GuestId, result.GuestId);
@@ -84,10 +83,22 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("GuestSource")]
         public void GetGuestByNameAndEventPin_AddFindCompare_ReturnsTrue(Guest guest)
         {
-            _uut.InsertGuest(guest);
-            var result = _uut.GetGuestByNameAndEventPin(guest.Name, "1").Result;
+            _uut.InsertGuest(guest).Wait();
+            var result = _uut.GetGuestByNameAndEventPin(guest.Name, guest.EventPin).Result;
 
-            Assert.AreEqual(guest.GuestId, result.GuestId);
+            Assert.AreEqual(guest.Name, result.Name);
+        }
+
+        [Test, TestCaseSource("GuestSource")]
+        public void DeleteGuestByPin_InserteDeleteCheckIfNothing_EqualsNull(Guest guest)
+        {
+            _uut.InsertGuest(guest).Wait();
+
+            _uut.DeleteGuestById(guest.GuestId).Wait();
+
+            var result = _uut.GetGuestById(guest.GuestId).Result;
+
+            Assert.AreEqual(null, result);
         }
 
         
@@ -95,15 +106,17 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void UpdateGuest_InsertChangeNameCheck_EqualsNewDescription()
         {
-            var GuestBefore = new Guest{GuestId = 1, Name = "Guest1"};
+            var GuestBefore = new Guest{ Name = "Guest1", EventPin = "1"};
 
-            var GuestAfter = new Guest {GuestId = 1, Name = "NewGuest1" };
+            
 
-            _uut.InsertGuest(GuestBefore);
+            _uut.InsertGuest(GuestBefore).Wait();
 
-            _uut.UpdateGuest(GuestAfter);
+            var GuestAfter = new Guest {GuestId = GuestBefore.GuestId, Name = "NewGuest1", EventPin = "1" };
 
-            var result = _uut.GetGuestById(1).Result;
+            _uut.UpdateGuest(GuestAfter).Wait();
+
+            var result = _uut.GetGuestById(GuestBefore.GuestId).Result;
 
             Assert.AreEqual("NewGuest1", result.Name);
         }

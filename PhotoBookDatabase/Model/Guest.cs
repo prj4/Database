@@ -14,7 +14,7 @@ namespace PhotoBookDatabase.Model
         [Required]
         public string EventPin { get; set; }
         public Event Event { get; set; }
-
+        public List<Picture> Pictures { get; set; }
         
     }
 }

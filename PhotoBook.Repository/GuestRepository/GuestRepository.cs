@@ -113,10 +113,27 @@ namespace PhotoBook.Repository.GuestRepository
         {
             if (ExistsById(id).Result)
             {
-                var guest = _context.Guests
-                    .FindAsync(id).Result;
+                using (var transaction = _context.Database.BeginTransactionAsync())
+                {
+                    var guest = _context.Guests
+                        .Include(g => g.Pictures)
+                        .FirstOrDefault(g => g.GuestId == id);
+                        
 
-                _context.Guests.Remove(guest);
+                    if (guest.Pictures.Count > 0)
+                    {
+                        _context.Pictures.RemoveRange(guest.Pictures);
+                    }
+
+
+
+                    _context.Guests.Remove(guest);
+                    transaction.Result.Commit();
+
+                    while (transaction.IsCompleted != true)
+                    { }
+                }
+
                 await _context.SaveChangesAsync();
             }
         }

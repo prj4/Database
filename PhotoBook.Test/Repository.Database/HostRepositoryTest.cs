@@ -8,19 +8,17 @@ using PhotoBook.Repository.HostRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace PhotoBook.Test.Repository.InMemory
+/*EN UNIT TEST AF GANGEN, Må ikke være andre HOST i databasen*/
+namespace PhotoBook.Test.Repository.Database
 {
     class HostRepositoryTest
     {
         private IHostRepository _uut;
-        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+        
 
         public HostRepositoryTest()
         {
-            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .Options;
+            
         }
 
         #region Sources
@@ -38,7 +36,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [SetUp]
         public void Setup()
         {
-            _uut = new HostRepository(new PhotoBookDbContext(_InMemoryOptions));
+            _uut = new HostRepository(new PhotoBookDbContext());
         }
 
         [TearDown]
@@ -59,58 +57,58 @@ namespace PhotoBook.Test.Repository.InMemory
             Assert.True(result); 
         }
 
-        
-
-        [Test, TestCaseSource("HostSource")]
-        public void InsertHost__InsertHostAndFind_returnsTrue(Host host)
-        {
-            _uut.InsertHost(host);
-
-            IEnumerable<Host> hosts = _uut.GetHosts().Result;
-
-            bool result = hosts.Any(h => h.HostId == host.HostId);
-
-            Assert.True(result);
-        }
-
-        [Test, TestCaseSource("HostSource")]
-        public void GetHostById_AddFindCompare_ReturnsTrue(Host host)
-        {
-            _uut.InsertHost(host);
-            var tempHost = _uut.GetHostById(host.HostId).Result;
-
-            Assert.AreEqual(host.HostId,tempHost.HostId);
-        }
-
         [Test, TestCaseSource("HostSource")]
         public void GetHostByEmail_AddFindCompare_ReturnsTrue(Host host)
         {
-            _uut.InsertHost(host);
-            var tempHost = _uut.GetHostByEmail(host.Email).Result;
+            _uut.InsertHost(host).Wait();
+            var result = _uut.GetHostByEmail(host.Email).Result;
 
-            Assert.AreEqual(host.HostId, tempHost.HostId);
+            Assert.AreEqual(host.HostId, result.HostId);
         }
 
-       
+        [Test, TestCaseSource("HostSource")]
+        public void DeleteHostById_InsertDeleteCheckifNothing_EqualsNull(Host host)
+        {
+            _uut.InsertHost(host).Wait();
+
+            _uut.DeleteHostById(host.HostId).Wait();
+
+            var result = _uut.GetHostById(host.HostId).Result;
+
+            Assert.AreEqual(null,result);
+        }
+
+        [Test, TestCaseSource("HostSource")]
+        public void DeleteHostByEmail_InsertDeleteCheckifNothing_EqualsNull(Host host)
+        {
+            _uut.InsertHost(host).Wait();
+
+            _uut.DeleteHostByEmail(host.Email).Wait();
+
+            var result = _uut.GetHostByEmail(host.Email).Result;
+
+            Assert.AreEqual(null, result);
+        }
 
         [Test]
         public void UpdateHost_InsertChangeEmailCheck_EqualsNewMailAddress()
         {
             var hostBefore = new Host
             {
-                HostId = 4,
                 Email = "Email1@email.com",
                 Name = "Host",
             };
 
+            
+
+            _uut.InsertHost(hostBefore).Wait();
+
             var hostAfter = new Host
             {
-                HostId = 4,
+                HostId = hostBefore.HostId,
                 Email = "NewEmail1@email.com",
                 Name = "Host",
             };
-
-            _uut.InsertHost(hostBefore).Wait();
 
             _uut.UpdateHost(hostAfter).Wait();
 

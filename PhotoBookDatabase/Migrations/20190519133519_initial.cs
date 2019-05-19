@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PhotoBookDatabase.Migrations
 {
-    public partial class Bas : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -42,7 +42,7 @@ namespace PhotoBookDatabase.Migrations
                         column: x => x.HostId,
                         principalTable: "Hosts",
                         principalColumn: "HostId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,7 +62,7 @@ namespace PhotoBookDatabase.Migrations
                         column: x => x.EventPin,
                         principalTable: "Events",
                         principalColumn: "Pin",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,8 +72,8 @@ namespace PhotoBookDatabase.Migrations
                     PictureId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     EventPin = table.Column<string>(nullable: false),
-                    GuestId = table.Column<int>(nullable: false),
-                    HostId = table.Column<int>(nullable: false)
+                    GuestId = table.Column<int>(nullable: true),
+                    HostId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,7 +83,19 @@ namespace PhotoBookDatabase.Migrations
                         column: x => x.EventPin,
                         principalTable: "Events",
                         principalColumn: "Pin",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pictures_Guests_GuestId",
+                        column: x => x.GuestId,
+                        principalTable: "Guests",
+                        principalColumn: "GuestId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pictures_Hosts_HostId",
+                        column: x => x.HostId,
+                        principalTable: "Hosts",
+                        principalColumn: "HostId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -102,12 +114,12 @@ namespace PhotoBookDatabase.Migrations
                 columns: new[] { "Pin", "Description", "EndDate", "HostId", "Location", "Name", "StartDate" },
                 values: new object[,]
                 {
-                    { "1", "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 4, 18, 13, 15, 38, 633, DateTimeKind.Local).AddTicks(5594) },
-                    { "1234", "Beskrivelse4", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation4", "Event4", new DateTime(2019, 4, 18, 13, 15, 38, 640, DateTimeKind.Local).AddTicks(1859) },
-                    { "2", "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 4, 18, 13, 15, 38, 640, DateTimeKind.Local).AddTicks(1780) },
-                    { "2345", "Beskrivelse5", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation5", "Event5", new DateTime(2019, 4, 18, 13, 15, 38, 640, DateTimeKind.Local).AddTicks(1868) },
-                    { "3", "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 4, 18, 13, 15, 38, 640, DateTimeKind.Local).AddTicks(1830) },
-                    { "3456", "Beskrivelse6", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation6", "Event6", new DateTime(2019, 4, 18, 13, 15, 38, 640, DateTimeKind.Local).AddTicks(1874) }
+                    { "1", "Beskrivelse1", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation1", "Event1", new DateTime(2019, 5, 19, 15, 35, 18, 286, DateTimeKind.Local).AddTicks(1901) },
+                    { "1234", "Beskrivelse4", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 1, "Lokation4", "Event4", new DateTime(2019, 5, 19, 15, 35, 18, 289, DateTimeKind.Local).AddTicks(2) },
+                    { "2", "Beskrivelse2", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation2", "Event2", new DateTime(2019, 5, 19, 15, 35, 18, 288, DateTimeKind.Local).AddTicks(9978) },
+                    { "2345", "Beskrivelse5", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 2, "Lokation5", "Event5", new DateTime(2019, 5, 19, 15, 35, 18, 289, DateTimeKind.Local).AddTicks(4) },
+                    { "3", "Beskrivelse3", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation3", "Event3", new DateTime(2019, 5, 19, 15, 35, 18, 288, DateTimeKind.Local).AddTicks(9999) },
+                    { "3456", "Beskrivelse6", new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999), 3, "Lokation6", "Event6", new DateTime(2019, 5, 19, 15, 35, 18, 289, DateTimeKind.Local).AddTicks(10) }
                 });
 
             migrationBuilder.InsertData(
@@ -125,9 +137,9 @@ namespace PhotoBookDatabase.Migrations
                 columns: new[] { "PictureId", "EventPin", "GuestId", "HostId" },
                 values: new object[,]
                 {
-                    { 1, "1", 0, 1 },
-                    { 2, "2", 0, 2 },
-                    { 3, "3", 0, 3 }
+                    { 1, "1", null, 1 },
+                    { 2, "2", null, 2 },
+                    { 3, "3", null, 3 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -150,15 +162,25 @@ namespace PhotoBookDatabase.Migrations
                 name: "IX_Pictures_EventPin",
                 table: "Pictures",
                 column: "EventPin");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pictures_GuestId",
+                table: "Pictures",
+                column: "GuestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pictures_HostId",
+                table: "Pictures",
+                column: "HostId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Guests");
+                name: "Pictures");
 
             migrationBuilder.DropTable(
-                name: "Pictures");
+                name: "Guests");
 
             migrationBuilder.DropTable(
                 name: "Events");

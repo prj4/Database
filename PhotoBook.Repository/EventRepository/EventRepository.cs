@@ -102,12 +102,33 @@ namespace PhotoBook.Repository.EventRepository
         {
             if (ExistsByPin(pin).Result)
             {
-                var eve = _context.Events
-                    .FindAsync(pin).Result;
+                using (var transaction = _context.Database.BeginTransactionAsync())
+                {
+                    var eve = _context.Events
+                        .Include(e => e.Host)
+                        .Include(e => e.Guests)
+                        .Include(e => e.Pictures)
+                        .FirstOrDefaultAsync(e => e.Pin == pin).Result;
 
-                _context.Events.Remove(eve);
-                await _context.SaveChangesAsync();
+                    if (eve.Pictures.Count > 0)
+                    {
+                        _context.Pictures.RemoveRange(eve.Pictures);
+                    }
+
+                    if (eve.Guests.Count > 0)
+                    {
+                        _context.Guests.RemoveRange(eve.Guests);
+                    }
+                    
+
+                    _context.Events.Remove(eve);
+                    transaction.Result.Commit();
+                    while(transaction.IsCompleted != true)
+                    { }
+                }
+                
             }
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateEvent(Event eve)

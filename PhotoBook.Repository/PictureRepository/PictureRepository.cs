@@ -135,7 +135,6 @@ namespace PhotoBook.Repository.PictureRepository
                     .FindAsync(pictureId);
                 return picture;
             }
-
             return null;
         }
 
@@ -158,13 +157,19 @@ namespace PhotoBook.Repository.PictureRepository
         {
             if (ExistsById(pictureId).Result)
             {
-                var picture = _context.Pictures
-                    .FindAsync(pictureId).Result;
+                using (var transaction = _context.Database.BeginTransactionAsync())
+                {
+                    var picture = _context.Pictures
+                        .FindAsync(pictureId).Result;
 
-                _context.Pictures.Remove(picture);
+                    _context.Pictures.Remove(picture);
+
+                    transaction.Result.Commit();
+                    while (transaction.IsCompleted != true)
+                    { }
+                }
                 await _context.SaveChangesAsync();
             }
-
         }
 
         

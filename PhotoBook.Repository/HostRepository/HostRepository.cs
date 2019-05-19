@@ -33,7 +33,7 @@ using PhotoBookDatabase.Model;
 
         private async Task<bool> ExistsByHost(Host host)
         {
-            bool result = await _context.Hosts.AnyAsync(h => h.HostId == host.HostId);
+            bool result = await _context.Hosts.AnyAsync(h => ((h.HostId == host.HostId)||(h.Email == host.Email)));
             return result;
         }
 
@@ -111,10 +111,35 @@ using PhotoBookDatabase.Model;
         {
             if (ExistsById(hostId).Result)
             {
-                var host = _context.Hosts
-                    .FindAsync(hostId).Result;
+                using (var transaction = _context.Database.BeginTransactionAsync())
+                {
+                    var host = _context.Hosts
+                        .Include(h => h.Events).ThenInclude(e => e.Guests)
+                        .Include(h => h.Events).ThenInclude(e => e.Pictures)
+                        .Include(h => h.Pictures)
+                        .FirstOrDefaultAsync(h => h.HostId == hostId).Result;
 
-                _context.Hosts.Remove(host);
+                    foreach (var eve in host.Events)
+                    {
+                        if (eve.Pictures.Count > 0)
+                        {
+                            _context.Pictures.RemoveRange(eve.Pictures);
+                        }
+
+                        if (eve.Guests.Count > 0)
+                        {
+                            _context.Guests.RemoveRange(eve.Guests);
+                        }
+
+                        _context.Events.Remove(eve);
+                    }
+
+                    _context.Hosts.Remove(host);
+
+                    transaction.Result.Commit();
+                    while (transaction.IsCompleted != true)
+                    { }
+                }
                 await _context.SaveChangesAsync();
             }
         }
@@ -124,13 +149,37 @@ using PhotoBookDatabase.Model;
             
                 if (ExistsByEmail(email).Result)
                 {
+                using (var transaction = _context.Database.BeginTransactionAsync())
+                {
                     var host = _context.Hosts
-                        .Where(x => x.Email == email)
-                        .FirstOrDefaultAsync().Result;
+                        .Include(h => h.Events).ThenInclude(e => e.Guests)
+                        .Include(h => h.Events).ThenInclude(e => e.Pictures)
+                        .Include(h => h.Pictures)
+                        .FirstOrDefaultAsync(h => h.Email == email).Result;
+
+                    foreach (var eve in host.Events)
+                    {
+                        if (eve.Pictures.Count > 0)
+                        {
+                            _context.Pictures.RemoveRange(eve.Pictures);
+                        }
+
+                        if (eve.Guests.Count > 0)
+                        {
+                            _context.Guests.RemoveRange(eve.Guests);
+                        }
+
+                        _context.Events.Remove(eve);
+                    }
 
                     _context.Hosts.Remove(host);
-                    await _context.SaveChangesAsync();
+
+                    transaction.Result.Commit();
+                    while (transaction.IsCompleted != true)
+                    { }
                 }
+                await _context.SaveChangesAsync();
+            }
             
         }
 

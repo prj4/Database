@@ -8,19 +8,18 @@ using PhotoBook.Repository.EventRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
-namespace PhotoBook.Test.Repository.InMemory
+/*EN UNIT TEST AF GANGEN*/
+namespace PhotoBook.Test.Repository.Database
 {
     class EventRepositoryTest
     {
-        private DbContextOptions<PhotoBookDbContext> _InMemoryOptions;
+        
         private IEventRepository _uut;
 
         public EventRepositoryTest()
         {
-            _InMemoryOptions = new DbContextOptionsBuilder<PhotoBookDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .Options;
+            
+
         }
 
         #region Sources
@@ -38,7 +37,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [SetUp]
         public void Setup()
         {
-            _uut = new EventRepository(new PhotoBookDbContext(_InMemoryOptions));
+            _uut = new EventRepository(new PhotoBookDbContext());
         }
 
         [TearDown]
@@ -50,7 +49,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("EventSource")]
         public void GetEvents_GettingListOfEventsAndFindingSpecific_ReturnsTrue(Event eve)
         {
-            _uut.InsertEvent(eve);
+            _uut.InsertEvent(eve).Wait();
 
             IEnumerable<Event> events = _uut.GetEvents().Result;
 
@@ -74,8 +73,8 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test, TestCaseSource("EventSource")]
         public void GetEventByPin_AddFindCompare_ReturnsTrue(Event eve)
         {
-            if (_uut.GetEventByPin(eve.Pin) != null)
-                _uut.InsertEvent(eve);
+            
+           _uut.InsertEvent(eve).Wait();
 
             var result = _uut.GetEventByPin(eve.Pin).Result;
 
@@ -84,15 +83,28 @@ namespace PhotoBook.Test.Repository.InMemory
 
         
         [Test, TestCaseSource("EventSource")]
+        public void DeleteEventByPin_InserteDeleteCheckIfNothing_EqualsNull(Event eve)
+        {
+            _uut.InsertEvent(eve).Wait();
+
+            _uut.DeleteEventByPin(eve.Pin).Wait();
+
+            var result = _uut.GetEventByPin(eve.Pin).Result;
+
+            Assert.AreEqual(null, result);
+        }
+
+
+        [Test, TestCaseSource("EventSource")]
         public void UpdateEvent_InsertChangeDescriptionCheck_EqualsNewDescription(Event eve)
         {
-            _uut.InsertEvent(eve);
+            _uut.InsertEvent(eve).Wait();
 
             var tempEve = _uut.GetEventByPin(eve.Pin).Result;
 
             tempEve.Description = "NewDescription1";
 
-            _uut.UpdateEvent(tempEve);
+            _uut.UpdateEvent(tempEve).Wait();
 
             var result = _uut.GetEventByPin(eve.Pin).Result;
 
@@ -106,7 +118,7 @@ namespace PhotoBook.Test.Repository.InMemory
         [Test]
         public void GetEventById_TryingToGetNonExistingEvent_ReturnsNull()
         {
-            var result = _uut.GetEventByPin("1").Result;
+            var result = _uut.GetEventByPin("9999").Result;
 
             Assert.AreEqual(null, result);
         }

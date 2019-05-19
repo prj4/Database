@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Compile Remove="Commands.cs" />
-    <Compile Remove="Migrations\20190418111409_Base.cs" />
     <Compile Remove="Model\EventGuest.cs" />
     <Compile Remove="Model\EventGuests.cs" />
     <Compile Remove="Program.cs" />

@@ -23,9 +23,10 @@ namespace PhotoBookDatabase.Data
         { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            /*Only for testing locally*/
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=tcp:katrinesphotobook.database.windows.net,1433;Initial Catalog=PhotoBook5;Persist Security Info=False;User ID=Ingeniørhøjskolen@katrinesphotobook.database.windows.net;Password=Katrinebjergvej22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");  
+                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=Demo-GeneralDAB-test;Trusted_Connection=True;MultipleActiveResultSets=true");  
             }   
         }
 
@@ -43,7 +44,7 @@ namespace PhotoBookDatabase.Data
                 .HasOne<Event>(g => g.Event)
                 .WithMany(e => e.Guests)
                 .HasForeignKey(g => g.EventPin)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             
 
@@ -61,7 +62,7 @@ namespace PhotoBookDatabase.Data
                 .HasMany(e => e.Pictures)
                 .WithOne(p => p.Event)
                 .HasForeignKey(p => p.EventPin)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Event>().HasData(
                 new Event { Location = "Lokation1", Description = "Beskrivelse1", Name = "Event1", HostId = 1, Pin = "1", StartDate = DateTime.Now, EndDate = DateTime.MaxValue },
@@ -83,7 +84,7 @@ namespace PhotoBookDatabase.Data
                 .HasMany(h => h.Events)
                 .WithOne(h => h.Host)
                 .HasForeignKey(e => e.HostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             
 
@@ -116,6 +117,20 @@ namespace PhotoBookDatabase.Data
 
         void PictureOnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Picture>()
+                .HasOne(p => p.Host)
+                .WithMany(h => h.Pictures)
+                .HasForeignKey(p => p.HostId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Picture>()
+                .HasOne(p => p.Guest)
+                .WithMany(g => g.Pictures)
+                .HasForeignKey(p => p.GuestId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.Entity<Picture>()
                 .HasData(
                     new Picture {PictureId = 1, EventPin = "1", HostId = 1},

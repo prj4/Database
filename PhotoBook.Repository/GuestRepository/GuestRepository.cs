@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
-[assembly: InternalsVisibleTo("PhotoBook.Test")]
+
 namespace PhotoBook.Repository.GuestRepository
 {
     public class GuestRepository : IGuestRepository

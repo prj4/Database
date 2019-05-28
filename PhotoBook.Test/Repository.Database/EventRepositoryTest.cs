@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
 using PhotoBook.Repository.EventRepository;
+using PhotoBook.Repository.PictureRepository;
 using PhotoBookDatabase.Data;
 using PhotoBookDatabase.Model;
 
@@ -13,21 +14,34 @@ namespace PhotoBook.Test.Repository.Database
 {
     class EventRepositoryTest
     {
-        
+
         private IEventRepository _uut;
 
         public EventRepositoryTest()
         {
-            
+
 
         }
 
         #region Sources
+
         private static Event[] EventSource =
         {
-            new Event{Location = "Lokation4", Description = "Beskrivelse4", Name = "Event4", HostId = 1, Pin = "9876", StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
-            new Event{Location = "Lokation5", Description = "Beskrivelse5", Name = "Event5", HostId = 2, Pin = "7865", StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
-            new Event{Location = "Lokation6", Description = "Beskrivelse6", Name = "Event6", HostId = 3, Pin = "5634", StartDate = DateTime.Now, EndDate = DateTime.MaxValue},
+            new Event
+            {
+                Location = "Lokation4", Description = "Beskrivelse4", Name = "Event4", HostId = 1, Pin = "9876",
+                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
+            },
+            new Event
+            {
+                Location = "Lokation5", Description = "Beskrivelse5", Name = "Event5", HostId = 2, Pin = "7865",
+                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
+            },
+            new Event
+            {
+                Location = "Lokation6", Description = "Beskrivelse6", Name = "Event6", HostId = 3, Pin = "5634",
+                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
+            },
         };
 
         #endregion
@@ -42,10 +56,13 @@ namespace PhotoBook.Test.Repository.Database
 
         [TearDown]
         public void TearDown()
-        { }
+        {
+        }
+
         #endregion
 
         #region Success Tests
+
         [Test, TestCaseSource("EventSource")]
         public void GetEvents_GettingListOfEventsAndFindingSpecific_ReturnsTrue(Event eve)
         {
@@ -73,15 +90,15 @@ namespace PhotoBook.Test.Repository.Database
         [Test, TestCaseSource("EventSource")]
         public void GetEventByPin_AddFindCompare_ReturnsTrue(Event eve)
         {
-            
-           _uut.InsertEvent(eve).Wait();
+
+            _uut.InsertEvent(eve).Wait();
 
             var result = _uut.GetEventByPin(eve.Pin).Result;
 
             Assert.AreEqual(eve.Pin, result.Pin);
         }
 
-        
+
         [Test, TestCaseSource("EventSource")]
         public void DeleteEventByPin_InserteDeleteCheckIfNothing_EqualsNull(Event eve)
         {
@@ -131,32 +148,44 @@ namespace PhotoBook.Test.Repository.Database
             Assert.AreEqual(null, result);
         }
 
-        public void GetEvent_GettingEventsAttachedToHost_ReturnsTrue()
+        [Test]
+        public void GetEventById_TryingToGetNonExistingPicture_ReturnsNull()
         {
-            var Event1 = new Event
+            
+            var host = new Host {Email = "Email1@email.com", Name = "Host"};
+
+            using (var context = new PhotoBookDbContext())
             {
-                Location = "Lokation", Description = "Beskrivelse", Name = "Event", HostId = 5, Pin = "4351",
-                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
-            };
-            var Event2 = new Event
+                context.Hosts.Add(host);
+            }
+
+            
+            var eve = new Event
             {
-                Location = "Lokation", Description = "Beskrivelse", Name = "Event", HostId = 5, Pin = "3451",
-                StartDate = DateTime.Now, EndDate = DateTime.MaxValue
+                Location = "Lokation4",
+                Description = "Beskrivelse4",
+                Name = "Event4",
+                HostId = host.HostId,
+                Pin = "7656",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.MaxValue
             };
-            _uut.InsertEvent(Event1);
-            _uut.InsertEvent(Event2);
 
-            var events = _uut.GetEventsByHostId(Event1.HostId).Result;
+            _uut.InsertEvent(eve).Wait();
+            _uut.DeleteEventByPin(eve.Pin);
 
+            var pic = new Picture { EventPin = "7656", HostId = host.HostId };
 
+            using (var context = new PhotoBookDbContext())
+            {
+                context.Pictures.Add(pic);
+                var result = context.Pictures.FirstOrDefaultAsync(p => p.PictureId == p.PictureId).Result;
 
-            var result = events.Count(e => e.HostId == Event1.HostId);
+                Assert.AreEqual(null, result);
+            }
 
-            Assert.AreEqual(null, result);
+            #endregion
+
         }
-
-
-        #endregion
-
     }
 }

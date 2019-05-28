@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PhotoBookDatabase.Model;
 
-//TODO: Missing implementation
+
 namespace PhotoBook.Repository.PictureRepository
 {
     public interface IPictureRepository

@@ -149,7 +149,7 @@ namespace PhotoBook.Test.Repository.Database
         }
 
         [Test]
-        public void GetEventById_TryingToGetNonExistingPicture_ReturnsNull()
+        public void GetEventById_CheckingOnDeleteBehaviorOnPicture_ReturnsNull()
         {
             
             var host = new Host {Email = "Email1@email.com", Name = "Host"};
@@ -179,7 +179,7 @@ namespace PhotoBook.Test.Repository.Database
             using (var context = new PhotoBookDbContext())
             {
                 context.Pictures.Add(pic);
-                var result = context.Pictures.FirstOrDefaultAsync(p => p.PictureId == p.PictureId).Result;
+                var result = context.Pictures.FirstOrDefaultAsync(p => p.EventPin == "7656").Result;
 
                 Assert.AreEqual(null, result);
             }

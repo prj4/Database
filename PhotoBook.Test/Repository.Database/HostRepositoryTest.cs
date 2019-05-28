@@ -135,8 +135,38 @@ namespace PhotoBook.Test.Repository.Database
             Assert.AreEqual(null, result);
         }
 
+        [Test]
+        public void GetHostById_CheckingOnDeleteBehaviorToEvent_ReturnsNull()
+        {
 
+            var host = new Host { Email = "Email1@email.com", Name = "Host" };
+
+            _uut.InsertHost(host).Wait();
+
+
+            var eve = new Event
+            {
+                Location = "Lokation4",
+                Description = "Beskrivelse4",
+                Name = "Event4",
+                HostId = host.HostId,
+                Pin = "5312",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.MaxValue
+            };
+
+            using (var context = new PhotoBookDbContext())
+            {
+
+                context.Events.Add(eve);
+                _uut.DeleteHostById(host.HostId).Wait();
+                var result = context.Events.FirstOrDefaultAsync(e => e.Pin == "5312").Result;
+
+                Assert.AreEqual(null, result);
+            }
+        }
         #endregion
+
 
     }
 }
